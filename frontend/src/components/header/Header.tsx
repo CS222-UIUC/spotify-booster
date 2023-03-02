@@ -1,14 +1,13 @@
 import React from 'react';
-import { AppBar, Toolbar, Button } from '@mui/material';
+import SpotifyLoginButton from '../login/Authorization';
+import { AppBar, Toolbar } from '@mui/material';
 
 function Header() {
   return (
     <AppBar>
       <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
         Spotify Booster
-        <Button variant="contained" color="secondary">
-          Login
-        </Button>
+        <SpotifyLoginButton />
       </Toolbar>
     </AppBar>
   );

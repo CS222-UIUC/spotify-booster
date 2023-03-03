@@ -1,5 +1,7 @@
 # Spotify Booster Frontend
+
 ## Commands
+
 - Run `npm install` to intall dependancies and generate a `node_modules` folder.
 - Run `npm start` to start the frontend locally.
 - Run `npm test` to run the frontend tests.

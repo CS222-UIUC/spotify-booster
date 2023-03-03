@@ -7,20 +7,27 @@ import SpotifyWebApi from 'spotify-web-api-js';
 const spotifyApi = new SpotifyWebApi();
 
 const SpotifyLogin: React.FC = () => {
-  const [token, setToken] = useState<string | null>(getCookie('spotify_access_token'));
+  const [token, setToken] = useState<string | null>(
+    getCookie('spotify_access_token')
+  );
   const [user, setUser] = useState<any>(null);
 
   const handleLogin = async () => {
     const clientId = '01e902e599d7467494c373c6873781ad';
 
     // Detect whether the URL is local environment or on remove server (e.g., on Vercel)
-    const redirectUri = (window.location.hostname == 'localhost') ?
-      'http://localhost:3000/callback' : 'https://' + window.location.hostname + 'callback';
+    const redirectUri =
+      window.location.hostname === 'localhost'
+        ? 'http://localhost:3000/callback'
+        : 'https://' + window.location.hostname + 'callback';
 
-    const scopes = 'user-read-email user-library-read user-read-playback-position';
+    const scopes =
+      'user-read-email user-library-read user-read-playback-position';
     const state = Math.random().toString(36).substring(7);
     const url = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&
-      scope=${encodeURIComponent(scopes)}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}`;
+      scope=${encodeURIComponent(scopes)}&redirect_uri=${encodeURIComponent(
+      redirectUri
+    )}&state=${state}`;
     window.location.href = url;
   };
 
@@ -46,9 +53,20 @@ const SpotifyLogin: React.FC = () => {
   return (
     <div>
       {/* Detects whether user has logged in or not */}
-      {user && token && <Button variant="contained">Welcome, {user.display_name}!</Button>}
-      {!token && <Button variant="contained" color="secondary" onClick={handleLogin}>Login with Spotify</Button>}
-      {token && <Button variant="contained" color="secondary" onClick={handleLogout}> Logout</Button>}
+      {user && token && (
+        <Button variant="contained">Welcome, {user.display_name}!</Button>
+      )}
+      {!token && (
+        <Button variant="contained" color="secondary" onClick={handleLogin}>
+          Login with Spotify
+        </Button>
+      )}
+      {token && (
+        <Button variant="contained" color="secondary" onClick={handleLogout}>
+          {' '}
+          Logout
+        </Button>
+      )}
     </div>
   );
 };

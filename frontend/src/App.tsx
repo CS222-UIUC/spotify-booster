@@ -4,7 +4,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import { theme } from './theme';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
-import Header from './components/header/Header';
+import Header from './components/Header';
 import GlobalStyles from '@mui/material/GlobalStyles';
 import Callback from './components/login/Callback';
 

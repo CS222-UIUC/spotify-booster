@@ -1,36 +1,27 @@
 {
-    "env": {
-        "browser": true,
-        "es6": true
-    },
-    "extends": [
-        "plugin:react/recommended",
-        "./node_modules/gts"
-    ],
-    "ignorePatterns": [
-        "build/**/*"
-    ],
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-        "ecmaVersion": "2020",
-        "sourceType": "module"
-    },
-    "plugins": [
-        "import"
-    ],
-    "rules": {
-        "node/no-unpublished-import": [
-            "error",
-            {
-                "allowModules": [
-                    "@testing-library/react"
-                ]
-            }
-        ]
-    },
-    "settings": {
-        "react": {
-            "version": "detect"
-        }
+  "env": {
+    "browser": true,
+    "es6": true
+  },
+  "extends": ["plugin:react/recommended", "./node_modules/gts"],
+  "ignorePatterns": ["build/**/*"],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": "2020",
+    "sourceType": "module"
+  },
+  "plugins": ["import"],
+  "rules": {
+    "node/no-unpublished-import": [
+      "error",
+      {
+        "allowModules": ["@testing-library/react"]
+      }
+    ]
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
     }
+  }
 }

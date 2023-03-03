@@ -1,7 +1,5 @@
 import express from 'express';
 import http from 'http';
-import https from 'https';
-import fs from 'fs';
 import path from 'path';
 
 import Logger from '../logger/logger';
@@ -16,32 +14,10 @@ import {
  * createHTTPSever() - Creates a http/https webserver using the environment configuration
  * @param log - logger
  * @param port - port to listen on
- * @param use_https - use https security or not
- * @param private_key_loc - location of private key (can be empty if not using https)
- * @param certificate_key_loc - location of certificte (can be empty if not using https)
  * @returns - webserver
  */
-function createHTTPServer(
-  log: Logger,
-  port: number,
-  use_https: boolean,
-  private_key_loc?: string,
-  certificate_key_loc?: string
-) {
-  let http_server;
-  if (use_https) {
-    // if using HTTPS, grab private key and certificate and create a https webserver
-    const privateKey = fs.readFileSync(private_key_loc, 'utf8');
-    const certificate = fs.readFileSync(certificate_key_loc, 'utf8');
-
-    http_server = https.createServer({
-      key: privateKey,
-      cert: certificate,
-    });
-  } else {
-    // otherwise just create a normal unsecured http webserver
-    http_server = http.createServer();
-  }
+function createHTTPServer(log: Logger, port: number) {
+  const http_server = http.createServer();
 
   http_server.listen(port);
   http_server.on('listening', () => {
@@ -60,7 +36,7 @@ function createHTTPServer(
  * @returns express webserver
  */
 function createExpressApp(
-  webserver: http.Server | https.Server,
+  webserver: http.Server,
   log: Logger,
   db_location: string,
   static_path: string,
@@ -95,28 +71,16 @@ function createExpressApp(
  * @param static_path - location of static web files
  * @param index_path - location of index.html file
  * @param port - port to listen on
- * @param use_https - use https security or not
- * @param private_key_loc - location of private key (can be empty if not using https)
- * @param certificate_key_loc - location of certificte (can be empty if not using https)
  * @returns express webserver
  */
 export default function StartWebServer(
   db_location: string,
   static_path: string,
   index_path: string,
-  port: number,
-  use_https: boolean,
-  private_key_loc?: string,
-  certificate_key_loc?: string
+  port: number
 ) {
   const logger = new Logger('Webserver');
-  const webserver = createHTTPServer(
-    logger,
-    port,
-    use_https,
-    private_key_loc,
-    certificate_key_loc
-  );
+  const webserver = createHTTPServer(logger, port);
   return createExpressApp(
     webserver,
     logger,

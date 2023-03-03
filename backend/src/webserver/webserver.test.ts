@@ -7,7 +7,6 @@ const TEMP_FILE_DIRECTORY = path.join(__dirname, 'test_webserver');
 
 const DB_LOCATION = path.join(TEMP_FILE_DIRECTORY, 'empty.db');
 const WEB_PORT = 8888;
-const USE_HTTPS = false;
 const WEB_STATIC_PATH = path.join(TEMP_FILE_DIRECTORY, 'static');
 const WEB_INDEX_PATH = path.join(TEMP_FILE_DIRECTORY, 'index.html');
 const TEST_URL = 'http://localhost:8888';
@@ -73,8 +72,7 @@ describe('Basic Web Server', () => {
       DB_LOCATION,
       WEB_STATIC_PATH,
       WEB_INDEX_PATH,
-      WEB_PORT,
-      USE_HTTPS
+      WEB_PORT
     );
 
     const req = request(TEST_URL);
@@ -97,8 +95,7 @@ describe('Basic Web Server', () => {
       DB_LOCATION,
       WEB_STATIC_PATH,
       WEB_INDEX_PATH,
-      WEB_PORT,
-      USE_HTTPS
+      WEB_PORT
     );
 
     const req = request(TEST_URL);
@@ -121,8 +118,7 @@ describe('Basic Web Server', () => {
       DB_LOCATION,
       WEB_STATIC_PATH,
       WEB_INDEX_PATH,
-      WEB_PORT,
-      USE_HTTPS
+      WEB_PORT
     );
     const req = request(TEST_URL);
     const response = await req.get('/subfolder/test_static1.js');

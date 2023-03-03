@@ -19,7 +19,7 @@ const SpotifyLogin: React.FC = () => {
     const redirectUri =
       window.location.hostname === 'localhost'
         ? 'http://localhost:3000/callback'
-        : 'https://' + window.location.hostname + 'callback';
+        : 'https://' + window.location.hostname + '/callback';
 
     const scopes =
       'user-read-email user-library-read user-read-playback-position';

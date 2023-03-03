@@ -16,7 +16,7 @@ const Callback: React.FC = () => {
     const redirectUri =
       window.location.hostname === 'localhost'
         ? 'http://localhost:3000/callback'
-        : 'https://' + window.location.hostname + 'callback';
+        : 'https://' + window.location.hostname + '/callback';
 
     // Store code and state for later use on Spotify API
     const query = querystring.parse(window.location.search.slice(1));

@@ -1,7 +1,7 @@
 import path from 'path';
 import dotenv from 'dotenv';
 dotenv.config({
-  path: path.join(__dirname, '..', '..', '.env'),
+  path: path.join(__dirname, '..', '.env'),
 });
 
 const DATABASE_PATH = process.env.DATABASE_PATH;

@@ -1,11 +1,25 @@
 import React from 'react';
 import './App.scss';
-import Header from './components/header/Header';
 import { ThemeProvider } from '@mui/material/styles';
 import { theme } from './theme';
-import GlobalStyles from '@mui/material/GlobalStyles';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
-function App() {
+import Header from './components/header/Header';
+import GlobalStyles from '@mui/material/GlobalStyles';
+import Callback from './components/login/Callback';
+
+export default function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/callback" element={<Callback />} />
+      </Routes>
+    </Router>
+  );
+}
+
+function Home() {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyles
@@ -17,5 +31,3 @@ function App() {
     </ThemeProvider>
   );
 }
-
-export default App;

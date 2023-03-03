@@ -1,13 +1,12 @@
-import React from 'react';
-import SpotifyLoginGroup from '../login/Authorization';
-import { AppBar, Toolbar } from '@mui/material';
+import SpotifyLogin from '../login/Authorization';
+import { AppBar, Link, Toolbar } from '@mui/material';
 
 function Header() {
   return (
     <AppBar>
       <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <b>Spotify Booster</b>
-        <SpotifyLoginGroup />
+        <Link href="/" underline="none" color="secondary"><b>Spotify Booster</b></Link>
+        <SpotifyLogin />
       </Toolbar>
     </AppBar>
   );

@@ -6,16 +6,39 @@ import Logger from '../logger/logger';
 export default function createTracksRouter(log: Logger, db: DatabaseInterface) {
   const router = express.Router();
 
-  router.get('/remixapi/getRemixTracks', (req, res) => {
-    //
+  router.get('/remixapi/getRemixTracks', async (req, res) => {
+    const remix_id = req.query.remix_id as string;
+
+    try {
+      const tracks = await db.getRemixTracks(remix_id);
+      res.status(200).send({ tracks });
+    } catch (error) {
+      res.status(400).send({ error_message: error.message });
+    }
   });
 
-  router.post('/remixapi/addTrack', (req, res) => {
-    //
+  router.put('/remixapi/addTrack', async (req, res) => {
+    const remix_id = req.query.remix_id as string;
+    const track_id = req.query.track_id as string;
+
+    try {
+      await db.addTrack(remix_id, track_id);
+      res.status(200).send({});
+    } catch (error) {
+      res.status(400).send({ error_message: error.message });
+    }
   });
 
-  router.post('/remixapi/removeTrack', (req, res) => {
-    //
+  router.delete('/remixapi/removeTrack', async (req, res) => {
+    const remix_id = req.query.remix_id as string;
+    const track_id = req.query.track_id as string;
+
+    try {
+      await db.removeTrack(remix_id, track_id);
+      res.status(200).send({});
+    } catch (error) {
+      res.status(400).send({ error_message: error.message });
+    }
   });
 
   return router;

@@ -4,6 +4,7 @@ import DatabaseInterface from '../database_interface/database_interface';
 import Logger from '../logger/logger';
 
 import createRemixesRouter from './remix_api_remixes';
+import createTracksRouter from './remix_api_tracks';
 
 export default function createRemixRouter(
   log: Logger,
@@ -13,6 +14,6 @@ export default function createRemixRouter(
 
   const router = express.Router();
   router.use(createRemixesRouter(log, db));
-
+  router.use(createTracksRouter(log, db));
   return router;
 }

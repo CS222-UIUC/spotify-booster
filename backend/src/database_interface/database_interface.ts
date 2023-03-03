@@ -620,7 +620,7 @@ export default class DatabaseInterface {
     return crypto
       .createHash('sha256')
       .update(this.remix_id_gen_.toString())
-      .digest('base64');
+      .digest('base64url');
   }
 
   /**
@@ -629,6 +629,11 @@ export default class DatabaseInterface {
    * @returns - if string is empty or not
    */
   private isEmpty(str: string): boolean {
-    return str === null || str.match(/^\s*$/) !== null || str === '';
+    return (
+      str === null ||
+      str === undefined ||
+      str.match(/^\s*$/) !== null ||
+      str === ''
+    );
   }
 }

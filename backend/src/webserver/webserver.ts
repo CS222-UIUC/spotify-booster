@@ -12,22 +12,27 @@ import {
   authenticationMiddleware,
 } from '../spotify_authentication/spotify_authentication';
 
-const WEB_PORT = parseInt(process.env.WEB_PORT) || 8080;
-const PRIVATE_KEY_LOC = process.env.PRIVATE_KEY_LOC;
-const CERTIFICATE_LOC = process.env.CERTIFICATE_LOC;
-const USE_HTTPS = process.env.USE_HTTPS === 'true';
-const WEB_STATIC_PATH = process.env.WEB_STATIC_PATH;
-const WEB_INDEX_PATH = process.env.WEB_INDEX_PATH;
-
 /**
  * createHTTPSever() - Creates a http/https webserver using the environment configuration
+ * @param log - logger
+ * @param port - port to listen on
+ * @param use_https - use https security or not
+ * @param private_key_loc - location of private key (can be empty if not using https)
+ * @param certificate_key_loc - location of certificte (can be empty if not using https)
+ * @returns - webserver
  */
-function createHTTPServer() {
+function createHTTPServer(
+  log: Logger,
+  port: number,
+  use_https: boolean,
+  private_key_loc?: string,
+  certificate_key_loc?: string
+) {
   let http_server;
-  if (USE_HTTPS) {
+  if (use_https) {
     // if using HTTPS, grab private key and certificate and create a https webserver
-    const privateKey = fs.readFileSync(PRIVATE_KEY_LOC, 'utf8');
-    const certificate = fs.readFileSync(CERTIFICATE_LOC, 'utf8');
+    const privateKey = fs.readFileSync(private_key_loc, 'utf8');
+    const certificate = fs.readFileSync(certificate_key_loc, 'utf8');
 
     http_server = https.createServer({
       key: privateKey,
@@ -38,21 +43,35 @@ function createHTTPServer() {
     http_server = http.createServer();
   }
 
-  http_server.listen(WEB_PORT);
+  http_server.listen(port);
+  http_server.on('listening', () => {
+    log.info(`Webserver listening on port: ${port}`);
+  });
   return http_server;
 }
 
 /**
  * createExpressApp() - Creates an express web app and loads routers and extensions
  * @param webserver - http/https webserver express should listen on
+ * @param log - logger
+ * @param db_location - location of remix database
+ * @param static_path - location of static web files
+ * @param index_path - location of index.html file
+ * @returns express webserver
  */
-function createExpressApp(webserver: http.Server | https.Server, log: Logger) {
-  const remix_api = createRemixRouter(log);
+function createExpressApp(
+  webserver: http.Server | https.Server,
+  log: Logger,
+  db_location: string,
+  static_path: string,
+  index_path: string
+) {
+  const remix_api = createRemixRouter(log, db_location);
   const spotify_auth = createSpotifyAuthenticationRouter(log);
   const { webLogError, webLogger } = createWebLogger(log);
 
   const app = express();
-  app.use(express.static(WEB_STATIC_PATH)); // setup static directory for webapp
+  app.use(express.static(static_path)); // setup static directory for webapp
   app.use(webLogger);
   app.use(remix_api);
   app.use(spotify_auth);
@@ -60,22 +79,49 @@ function createExpressApp(webserver: http.Server | https.Server, log: Logger) {
 
   // serve homepage
   app.get('/index', (res, req) => {
-    req.sendFile(path.resolve(WEB_INDEX_PATH));
+    req.sendFile(path.resolve(index_path));
   });
 
   app.use(webLogError); // must go at the end to make sure errors are handled
 
   webserver.on('request', app);
 
-  webserver.on('listening', () => {
-    log.info(`Webserver listening on port: ${WEB_PORT}`);
-  });
-
   return webserver;
 }
 
-export default function StartWebServer() {
-  const webserver = createHTTPServer();
+/**
+ * StartWebServer() - Starts the webserver
+ * @param db_location - location of remix database
+ * @param static_path - location of static web files
+ * @param index_path - location of index.html file
+ * @param port - port to listen on
+ * @param use_https - use https security or not
+ * @param private_key_loc - location of private key (can be empty if not using https)
+ * @param certificate_key_loc - location of certificte (can be empty if not using https)
+ * @returns express webserver
+ */
+export default function StartWebServer(
+  db_location: string,
+  static_path: string,
+  index_path: string,
+  port: number,
+  use_https: boolean,
+  private_key_loc?: string,
+  certificate_key_loc?: string
+) {
   const logger = new Logger('Webserver');
-  return createExpressApp(webserver, logger);
+  const webserver = createHTTPServer(
+    logger,
+    port,
+    use_https,
+    private_key_loc,
+    certificate_key_loc
+  );
+  return createExpressApp(
+    webserver,
+    logger,
+    db_location,
+    static_path,
+    index_path
+  );
 }

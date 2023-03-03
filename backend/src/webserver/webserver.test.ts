@@ -5,9 +5,12 @@ import path from 'path';
 
 const TEMP_FILE_DIRECTORY = path.join(__dirname, 'test_webserver');
 
-process.env.WEB_PORT = '8888';
-process.env.WEB_STATIC_PATH = path.join(TEMP_FILE_DIRECTORY, 'static');
-process.env.WEB_INDEX_PATH = path.join(TEMP_FILE_DIRECTORY, 'index.html');
+const DB_LOCATION = path.join(TEMP_FILE_DIRECTORY, 'empty.db');
+const WEB_PORT = 8888;
+const USE_HTTPS = false;
+const WEB_STATIC_PATH = path.join(TEMP_FILE_DIRECTORY, 'static');
+const WEB_INDEX_PATH = path.join(TEMP_FILE_DIRECTORY, 'index.html');
+const TEST_URL = 'http://localhost:8888';
 
 // import after setting environment variables
 import StartWebServer from './webserver';
@@ -37,17 +40,17 @@ before(async () => {
     fs.mkdirSync(TEMP_FILE_DIRECTORY, { recursive: true });
     fs.emptyDirSync(TEMP_FILE_DIRECTORY);
 
-    fs.writeFileSync(process.env.WEB_INDEX_PATH, test_index_file);
+    fs.writeFileSync(WEB_INDEX_PATH, test_index_file);
 
-    fs.mkdirSync(process.env.WEB_STATIC_PATH, { recursive: true });
+    fs.mkdirSync(WEB_STATIC_PATH, { recursive: true });
     fs.writeFileSync(
-      path.join(process.env.WEB_STATIC_PATH, 'test_static0.js'),
+      path.join(WEB_STATIC_PATH, 'test_static0.js'),
       test_static_file0
     );
 
-    fs.mkdirSync(path.join(process.env.WEB_STATIC_PATH, 'subfolder'));
+    fs.mkdirSync(path.join(WEB_STATIC_PATH, 'subfolder'));
     fs.writeFileSync(
-      path.join(process.env.WEB_STATIC_PATH, 'subfolder', 'test_static1.js'),
+      path.join(WEB_STATIC_PATH, 'subfolder', 'test_static1.js'),
       test_static_file1
     );
   } catch {
@@ -66,9 +69,15 @@ after(async () => {
 
 describe('Basic Web Server', () => {
   it('returns index page at /index', async () => {
-    const server = StartWebServer();
+    const server = StartWebServer(
+      DB_LOCATION,
+      WEB_STATIC_PATH,
+      WEB_INDEX_PATH,
+      WEB_PORT,
+      USE_HTTPS
+    );
 
-    const req = request('http://localhost:8888');
+    const req = request(TEST_URL);
     const response = await req.get('/index');
 
     assert(
@@ -84,9 +93,15 @@ describe('Basic Web Server', () => {
   });
 
   it('returns static content at /test_static0.js', async () => {
-    const server = StartWebServer();
+    const server = StartWebServer(
+      DB_LOCATION,
+      WEB_STATIC_PATH,
+      WEB_INDEX_PATH,
+      WEB_PORT,
+      USE_HTTPS
+    );
 
-    const req = request('http://localhost:8888');
+    const req = request(TEST_URL);
     const response = await req.get('/test_static0.js');
 
     assert(
@@ -102,9 +117,14 @@ describe('Basic Web Server', () => {
   });
 
   it('returns static content in a subfolder at /subfolder/test_static1.js', async () => {
-    const server = StartWebServer();
-
-    const req = request('http://localhost:8888');
+    const server = StartWebServer(
+      DB_LOCATION,
+      WEB_STATIC_PATH,
+      WEB_INDEX_PATH,
+      WEB_PORT,
+      USE_HTTPS
+    );
+    const req = request(TEST_URL);
     const response = await req.get('/subfolder/test_static1.js');
 
     assert(

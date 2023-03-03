@@ -1,6 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express';
 
-import Logger from './logger';
+import Logger from '../logger/logger';
 
 /**
  * createSpotifyAuthenticationRouter() - Creates router for spotify authentication

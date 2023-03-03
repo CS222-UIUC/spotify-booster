@@ -4,6 +4,6 @@ dotenv.config({
   path: path.join(__dirname, '..', '..', '.env'),
 });
 
-import StartWebServer from './webserver';
+import StartWebServer from './webserver/webserver';
 
 StartWebServer();

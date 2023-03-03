@@ -3,7 +3,7 @@ const sqlite3 = verbose();
 import crypto from 'crypto';
 import fs from 'fs-extra';
 
-import Logger from './logger';
+import Logger from '../logger/logger';
 
 /**
  * DatabaseInterface()

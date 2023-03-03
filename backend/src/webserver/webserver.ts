@@ -4,13 +4,13 @@ import https from 'https';
 import fs from 'fs';
 import path from 'path';
 
-import Logger from './logger';
+import Logger from '../logger/logger';
 import createWebLogger from './web_logger';
-import createRemixRouter from './remix_api';
+import createRemixRouter from '../remix_api/remix_api';
 import {
   createSpotifyAuthenticationRouter,
   authenticationMiddleware,
-} from './spotify_authentication';
+} from '../spotify_authentication/spotify_authentication';
 
 const WEB_PORT = parseInt(process.env.WEB_PORT) || 8080;
 const PRIVATE_KEY_LOC = process.env.PRIVATE_KEY_LOC;

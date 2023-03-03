@@ -10,7 +10,7 @@ process.env.WEB_STATIC_PATH = path.join(TEMP_FILE_DIRECTORY, 'static');
 process.env.WEB_INDEX_PATH = path.join(TEMP_FILE_DIRECTORY, 'index.html');
 
 // import after setting environment variables
-import StartWebServer from '../src/webserver';
+import StartWebServer from './webserver';
 
 const test_index_file = `
 <!DOCTYPE html>

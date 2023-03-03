@@ -2,7 +2,7 @@ import { assert } from 'chai';
 import fs from 'fs-extra';
 import path from 'path';
 
-import Logger from '../src/logger';
+import Logger from './logger';
 
 const LOG_FILE_DIRECTORY = path.join(__dirname, 'test_logs');
 

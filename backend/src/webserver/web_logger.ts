@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 
-import Logger from './logger';
+import Logger from '../logger/logger';
 
 /**
  * createWebLogger() - Creates a middleware function to log info about express server

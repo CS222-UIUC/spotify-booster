@@ -11,10 +11,12 @@ POST: /remixapi/createRemix?name=remix_name
 ### Response
 ```js
 {
-  "remix_id": string
+  "remix_id": string,
+  "error_message": string
 }
 ```
 `"remix_id"` is the unique remix id of the remix that was just created
+`"error_message"` contains an error message if there was an error
 
 ### Status Codes
 | Code | Description |
@@ -37,9 +39,11 @@ Get: /remixapi/getRemixName?remix_id=MTUxODVkMzFmZDc2MGUwNjg2YjFiMTFjZTRkNzYxMjA
 ```js
 {
   "name": string
+  "error_message": string
 }
 ```
 `"name"` is the name of the remix
+`"error_message"` contains an error message if there was an error
 
 ### Status Codes
 | Code | Description |
@@ -60,8 +64,11 @@ PUT: /remixapi/setRemixName?name=new_name&remix_id=MTUxODVkMzFmZDc2MGUwNjg2YjFiM
 
 ### Response
 ```js
-{}
+{
+  "error_message": string
+}
 ```
+`"error_message"` contains an error message if there was an error
 
 ### Status Codes
 | Code | Description |
@@ -81,8 +88,11 @@ DELETE: /remixapi/deleteRemix?remix_id=MTUxODVkMzFmZDc2MGUwNjg2YjFiMTFjZTRkNzYxM
 | remix_id | `string` | Unique remix_id of the remix you're trying to delete |
 ### Response
 ```js
-{}
+{
+  "error_message": string
+}
 ```
+`"error_message"` contains an error message if there was an error
 
 ### Status Codes
 | Code | Description |
@@ -103,10 +113,12 @@ Get: /remixapi/getRemixTracks?remix_id=MTUxODVkMzFmZDc2MGUwNjg2YjFiMTFjZTRkNzYxM
 ### Response
 ```js
 {
-  "tracks": Array<string>
+  "tracks": Array<string>,
+  "error_message": string
 }
 ```
 `"tracks"` is an array of spotify track_ids 
+`"error_message"` contains an error message if there was an error
 
 ### Status Codes
 | Code | Description |
@@ -128,8 +140,11 @@ PUT: /remixapi/addTrack?track_id=6wmcrRId5aeo7hiEqHAtEO&remix_id=MTUxODVkMzFmZDc
 
 ### Response
 ```js
-{}
+{
+  "error_message": string
+}
 ```
+`"error_message"` contains an error message if there was an error
 
 ### Status Codes
 | Code | Description |
@@ -151,8 +166,11 @@ DELETE: /remixapi/removeTrack?track_id=6wmcrRId5aeo7hiEqHAtEO&remix_id=MTUxODVkM
 
 ### Response
 ```js
-{}
+{
+  "error_message": string
+}
 ```
+`"error_message"` contains an error message if there was an error
 
 ### Status Codes
 | Code | Description |

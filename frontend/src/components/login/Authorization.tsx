@@ -7,9 +7,11 @@ import SpotifyWebApi from 'spotify-web-api-js';
 const spotifyApi = new SpotifyWebApi();
 
 const SpotifyLogin: React.FC = () => {
+  let isRequestSentGetProfile = false; // Call the Spoitfy API only once
   const [token, setToken] = useState<string | null>(
     getCookie('spotify_access_token')
   );
+  const [userName, setUserName] = useState<string | null>('');
   const [user, setUser] = useState<any>(null);
 
   const handleLogin = async () => {
@@ -45,16 +47,26 @@ const SpotifyLogin: React.FC = () => {
     };
 
     if (token) {
-      spotifyApi.setAccessToken(token);
-      getUserProfile();
+      if (!isRequestSentGetProfile) {
+        spotifyApi.setAccessToken(token);
+        getUserProfile();
+        isRequestSentGetProfile = true;
+      }
     }
   }, [token]);
+
+  useEffect(() => {
+    if (user) {
+      setUserName(user.display_name);
+      console.log(user);
+    }
+  }, [user]);
 
   return (
     <div>
       {/* Detects whether user has logged in or not */}
       {user && token && (
-        <Button variant="contained">Welcome, {user.display_name}!</Button>
+        <Button variant="contained">Welcome, {userName}!</Button>
       )}
       {!token && (
         <Button variant="contained" color="secondary" onClick={handleLogin}>

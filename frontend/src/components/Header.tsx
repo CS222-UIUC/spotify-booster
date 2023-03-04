@@ -1,8 +1,9 @@
 import React from 'react';
-import SpotifyLogin from './login/Authorization';
+
+import SpotifyLogin from './login/Login';
 import { AppBar, Link, Toolbar } from '@mui/material';
 
-function Header() {
+export default function Header() {
   return (
     <AppBar>
       <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -14,5 +15,3 @@ function Header() {
     </AppBar>
   );
 }
-
-export default Header;

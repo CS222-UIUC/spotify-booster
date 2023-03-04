@@ -41,6 +41,8 @@
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^5.0.0-next-d49e0e0be-20230302",
     "gts": "^3.1.1",
+    "history": "^5.3.0",
+    "js-cookie": "^3.0.1",
     "path": "^0.12.7",
     "querystring": "^0.2.1",
     "react": "^18.2.0",

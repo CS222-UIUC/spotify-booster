@@ -1,15 +1,19 @@
 import React from 'react';
+
 import { useEffect } from 'react';
 import { setCookie } from './Cookie';
 import { useNavigate } from 'react-router-dom';
+
 import querystring from 'querystring';
 import SpotifyWebApi from 'spotify-web-api-js';
+import spotify_config from '../../config/spotify_config';
 
 const spotifyApi = new SpotifyWebApi();
 
 const Callback: React.FC = () => {
-  let isRequestSent = false; // Call the Spoitfy API only once
-  const navigate = useNavigate();
+  let isRequestSent = false; // Make sure to call the Spoitfy API only once
+
+  const navigate = useNavigate(); // Initiate `useNavigate()`
 
   const handleRedirect = async () => {
     // Detect whether the URL is local environment or on remove server (e.g., on Vercel)
@@ -23,16 +27,18 @@ const Callback: React.FC = () => {
     const code = query.code;
     const state = query.state;
 
+    // Make sure the request is only sent once
     if (code && state && !isRequestSent) {
       // Exchange the authorization code for an access token
       isRequestSent = true;
       try {
+        // Request token from Spotify API
         const response = await fetch('https://accounts.spotify.com/api/token', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
             Authorization: `Basic ${btoa(
-              '01e902e599d7467494c373c6873781ad:4990665be4f148d696cc5143ca4f84e4'
+              spotify_config.clientId + ':' + spotify_config.clientSec
             )}`,
           },
           body: querystring.stringify({
@@ -41,20 +47,21 @@ const Callback: React.FC = () => {
             redirect_uri: redirectUri,
           }),
         });
+
         const data = await response.json();
         if (data.access_token !== null) {
           // Set the access token in a cookie that expires in 7 days
           spotifyApi.setAccessToken(data.access_token);
+          // Set cookie
           setCookie('spotify_access_token', data.access_token, 7);
 
           // Remove the query parameters from the URL
           window.history.replaceState(null, '', redirectUri);
         }
-        navigate('/');
       } catch (error) {
-        navigate('/');
-        // @TODO: handle request error, e.g., add a backdrop to prompt use about the failed logging.
+        console.log('Spotify API request: ', error);
       }
+      navigate('/');
     }
   };
 

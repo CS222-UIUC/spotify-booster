@@ -5,10 +5,6 @@ import path from 'path';
 import Logger from '../logger/logger';
 import createWebLogger from './web_logger';
 import createRemixRouter from '../remix_api/remix_api';
-import {
-  createSpotifyAuthenticationRouter,
-  authenticationMiddleware,
-} from '../spotify_authentication/spotify_authentication';
 
 /**
  * createHTTPSever() - Creates a http/https webserver using the environment configuration
@@ -43,15 +39,12 @@ function createExpressApp(
   index_path: string
 ) {
   const remix_api = createRemixRouter(log, db_location);
-  const spotify_auth = createSpotifyAuthenticationRouter(log);
   const { webLogError, webLogger } = createWebLogger(log);
 
   const app = express();
   app.use(express.static(static_path)); // setup static directory for webapp
   app.use(webLogger);
   app.use(remix_api);
-  app.use(spotify_auth);
-  app.use(authenticationMiddleware);
 
   // serve homepage
   app.get('/index', (res, req) => {

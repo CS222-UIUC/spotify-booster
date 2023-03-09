@@ -3,6 +3,13 @@ import express from 'express';
 import DatabaseInterface from '../database_interface/database_interface';
 import Logger from '../logger/logger';
 
+/**
+ * createTracksRouter() - Returns router for tracks part of remix api
+ * Handles adding/removing/fetching tracks
+ * @param log - logger
+ * @param db - database interface for remixes and tracks
+ * @returns - Express router
+ */
 export default function createTracksRouter(log: Logger, db: DatabaseInterface) {
   const router = express.Router();
 

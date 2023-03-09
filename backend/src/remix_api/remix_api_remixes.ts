@@ -3,6 +3,13 @@ import express from 'express';
 import DatabaseInterface from '../database_interface/database_interface';
 import Logger from '../logger/logger';
 
+/**
+ * createRemixesRouter() - Returns router for remix part of remix api
+ * Handles adding/editing/deleting remixes
+ * @param log - logger
+ * @param db - database interface for remixes and tracks
+ * @returns - Express router
+ */
 export default function createRemixesRouter(
   log: Logger,
   db: DatabaseInterface

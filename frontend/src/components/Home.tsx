@@ -1,13 +1,16 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 
+// Styling import
 import { ThemeProvider } from '@mui/material/styles';
 import { theme } from '../theme';
 import GlobalStyles from '@mui/material/GlobalStyles';
 import '../App.scss';
 
+// Components import
 import Header from './Header';
 import Finder from './finder/Finder';
+import Splash from './splash/Splash';
 import { getCookie } from '../components/login/Cookie';
 
 function Home() {
@@ -27,7 +30,8 @@ function Home() {
         }}
       ></GlobalStyles>
       <Header />
-      {isLoggedIn && <Finder />}
+      {/* {isLoggedIn && <Finder />} */}
+      {isLoggedIn ? <Finder /> : <Splash />}
     </ThemeProvider>
   );
 }

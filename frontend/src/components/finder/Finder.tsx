@@ -17,6 +17,7 @@ const NO_RESULTS: Result[] = [
     id: 'N/A',
   },
 ];
+
 const LOADING_RESULTS: Result[] = [
   {
     resultType: ResultType.None,

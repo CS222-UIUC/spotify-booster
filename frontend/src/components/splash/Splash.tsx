@@ -8,21 +8,28 @@ export default function Splash() {
       sx={{
         height: '90vh', // Set background height to fill the viewport
         display: 'flex', // Use flexbox to align content
+        flexDirection: 'column', // Stack content vertically
         justifyContent: 'center', // Center content horizontally
         alignItems: 'center', // Center content vertically
-        backgroundColor: 'primary.secondary', // Set background color
+        color: 'secondary.main',
       }}
     >
       <Typography
-        variant="h3"
-        color="secondary"
+        variant="h2"
         sx={{
           fontWeight: 'bold',
-          position: 'relative', // Set position to relative to stack on top of the overlay
-          zIndex: 1, // Set a higher zIndex to make sure the text is displayed above the overlay
         }}
+        gutterBottom
       >
         Create mash-up with your Spotify favorites
+      </Typography>
+      <Typography
+        variant="h5"
+        sx={{
+          fontWeight: 'bold',
+        }}
+      >
+        Log in with your Spotify account to get started
       </Typography>
     </Box>
   );

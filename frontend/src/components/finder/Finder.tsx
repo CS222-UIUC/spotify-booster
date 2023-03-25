@@ -82,11 +82,10 @@ function Finder() {
     <Paper
       color={theme.palette.background.paper}
       sx={{
-        width: '35%',
-        maxHeight: 600,
+        width: '100%',
+        maxHeight: '100%',
         display: 'flex', // Prevent the list from overflowing.
         flexDirection: 'column',
-        margin: 2,
       }}
       elevation={5}
     >

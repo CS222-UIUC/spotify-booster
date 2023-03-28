@@ -1,3 +1,5 @@
+// This file contains the entire code for the Home component.
+
 import React from 'react';
 import { useState, useEffect } from 'react';
 
@@ -28,6 +30,7 @@ function Home() {
   const cookie = getCookie('spotify_access_token');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  // Checks if user is logged in by checking if user token exists
   useEffect(() => {
     const loggedIn = cookie != null;
     setIsLoggedIn(loggedIn);

@@ -1,3 +1,6 @@
+// This file contains the entire code for the Player component.
+// It is a container for the Control and TrackList components.
+
 import React from 'react';
 
 import { Grid } from '@mui/material';

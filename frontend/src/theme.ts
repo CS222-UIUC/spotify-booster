@@ -14,7 +14,7 @@ export const theme = createTheme({
   },
 });
 
-export const ControllerContainer = styled(Paper)(({ theme }) => ({
+export const ControllerContainer = styled(Paper)((/*{ theme }*/) => ({
   // backgroundColor: theme.palette.background.paper,
   width: '100%',
   height: '100%',
@@ -22,7 +22,7 @@ export const ControllerContainer = styled(Paper)(({ theme }) => ({
   elevation: 5,
 }));
 
-export const TrackListContainer = styled(Paper)(({ theme }) => ({
+export const TrackListContainer = styled(Paper)((/*{ theme }*/) => ({
   // backgroundColor: theme.palette.background.paper,
   width: '100%',
   height: '100%',

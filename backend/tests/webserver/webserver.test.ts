@@ -47,16 +47,10 @@ before(async () => {
     fs.writeFileSync(WEB_INDEX_PATH, test_index_file);
 
     fs.mkdirSync(WEB_STATIC_PATH, { recursive: true });
-    fs.writeFileSync(
-      path.join(WEB_STATIC_PATH, 'test_static0.js'),
-      test_static_file0
-    );
+    fs.writeFileSync(path.join(WEB_STATIC_PATH, 'test_static0.js'), test_static_file0);
 
     fs.mkdirSync(path.join(WEB_STATIC_PATH, 'subfolder'));
-    fs.writeFileSync(
-      path.join(WEB_STATIC_PATH, 'subfolder', 'test_static1.js'),
-      test_static_file1
-    );
+    fs.writeFileSync(path.join(WEB_STATIC_PATH, 'subfolder', 'test_static1.js'), test_static_file1);
   } catch {
     /* */
   }
@@ -77,21 +71,12 @@ after(async () => {
 
 describe('Basic Web Server', () => {
   it('returns index page at /index', async () => {
-    const server = StartWebServer(
-      DB_LOCATION,
-      WEB_STATIC_PATH,
-      WEB_INDEX_PATH,
-      WEB_PORT,
-      false
-    );
+    const server = StartWebServer(DB_LOCATION, WEB_STATIC_PATH, WEB_INDEX_PATH, WEB_PORT, false);
 
     const req = request(TEST_URL);
     const response = await req.get('/index');
 
-    assert(
-      response.text === test_index_file,
-      'Responds with correct index file'
-    );
+    assert(response.text === test_index_file, 'Responds with correct index file');
 
     return new Promise((resolve) => {
       server.close(() => {
@@ -101,21 +86,12 @@ describe('Basic Web Server', () => {
   });
 
   it('returns static content at /test_static0.js', async () => {
-    const server = StartWebServer(
-      DB_LOCATION,
-      WEB_STATIC_PATH,
-      WEB_INDEX_PATH,
-      WEB_PORT,
-      false
-    );
+    const server = StartWebServer(DB_LOCATION, WEB_STATIC_PATH, WEB_INDEX_PATH, WEB_PORT, false);
 
     const req = request(TEST_URL);
     const response = await req.get('/test_static0.js');
 
-    assert(
-      response.text === test_static_file0,
-      'Responds with correct static file'
-    );
+    assert(response.text === test_static_file0, 'Responds with correct static file');
 
     return new Promise((resolve) => {
       server.close(() => {
@@ -125,20 +101,11 @@ describe('Basic Web Server', () => {
   });
 
   it('returns static content in a subfolder at /subfolder/test_static1.js', async () => {
-    const server = StartWebServer(
-      DB_LOCATION,
-      WEB_STATIC_PATH,
-      WEB_INDEX_PATH,
-      WEB_PORT,
-      false
-    );
+    const server = StartWebServer(DB_LOCATION, WEB_STATIC_PATH, WEB_INDEX_PATH, WEB_PORT, false);
     const req = request(TEST_URL);
     const response = await req.get('/subfolder/test_static1.js');
 
-    assert(
-      response.text === test_static_file1,
-      'Responds with correct static file'
-    );
+    assert(response.text === test_static_file1, 'Responds with correct static file');
 
     return new Promise((resolve) => {
       server.close(() => {
@@ -177,13 +144,7 @@ describe('Web Logger', () => {
       };
     });
 
-    const server = StartWebServer(
-      DB_LOCATION,
-      WEB_STATIC_PATH,
-      WEB_INDEX_PATH,
-      WEB_PORT,
-      false
-    );
+    const server = StartWebServer(DB_LOCATION, WEB_STATIC_PATH, WEB_INDEX_PATH, WEB_PORT, false);
 
     const req = request(TEST_URL);
     await req.get('/error');
@@ -225,18 +186,9 @@ describe('Allow CORS', () => {
       };
     });
 
-    const server = StartWebServer(
-      DB_LOCATION,
-      WEB_STATIC_PATH,
-      WEB_INDEX_PATH,
-      WEB_PORT,
-      true
-    );
+    const server = StartWebServer(DB_LOCATION, WEB_STATIC_PATH, WEB_INDEX_PATH, WEB_PORT, true);
 
-    assert(
-      spy.calledWith('Enabling Cross-Origin Resource Sharing (CORS)'),
-      'CORS middleware is used'
-    );
+    assert(spy.calledWith('Enabling Cross-Origin Resource Sharing (CORS)'), 'CORS middleware is used');
 
     server.close();
   });

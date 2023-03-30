@@ -72,17 +72,11 @@ function fetch_log(logger_name: string): {
 } {
   const date_string = format_date(Date.now());
   const debug_logs = fs
-    .readFileSync(
-      path.join(LOG_FILE_DIRECTORY, `${logger_name}-Debug-${date_string}.log`),
-      'utf-8'
-    )
+    .readFileSync(path.join(LOG_FILE_DIRECTORY, `${logger_name}-Debug-${date_string}.log`), 'utf-8')
     .split('\r');
 
   const info_logs = fs
-    .readFileSync(
-      path.join(LOG_FILE_DIRECTORY, `${logger_name}-Info-${date_string}.log`),
-      'utf-8'
-    )
+    .readFileSync(path.join(LOG_FILE_DIRECTORY, `${logger_name}-Info-${date_string}.log`), 'utf-8')
     .split('\r');
 
   const debug: Array<{
@@ -130,15 +124,9 @@ function compare_logs(
   max_time: number
 ) {
   for (let i = 0; i < expected.length; i++) {
-    assert(
-      log_file[i].level === expected[i].level,
-      `Log levels match for: ${JSON.stringify(log_file[i])}`
-    );
+    assert(log_file[i].level === expected[i].level, `Log levels match for: ${JSON.stringify(log_file[i])}`);
 
-    assert(
-      log_file[i].message.startsWith(expected[i].message),
-      `Log messages match for: ${JSON.stringify(log_file[i])}`
-    );
+    assert(log_file[i].message.startsWith(expected[i].message), `Log messages match for: ${JSON.stringify(log_file[i])}`);
 
     assert(
       new Date(log_file[i].timestamp).getTime() >= min_time,
@@ -150,10 +138,7 @@ function compare_logs(
     );
 
     if (expected[i].stack) {
-      assert(
-        log_file[i].stack,
-        `Log error message exists for: ${JSON.stringify(log_file[i])}`
-      );
+      assert(log_file[i].stack, `Log error message exists for: ${JSON.stringify(log_file[i])}`);
 
       assert(
         log_file[i].stack.startsWith('Error: ' + expected[i].stack),
@@ -162,10 +147,7 @@ function compare_logs(
     }
   }
 
-  assert(
-    log_file.length === expected.length,
-    'Log file and expected had same length'
-  );
+  assert(log_file.length === expected.length, 'Log file and expected had same length');
 }
 
 // creates a new array of expected output without debug logs
@@ -200,10 +182,7 @@ describe('Logger constructor', () => {
     new Logger(name);
 
     const date_string = format_date(Date.now());
-    const expected_files = [
-      `${name}-Info-${date_string}.log`,
-      `${name}-Debug-${date_string}.log`,
-    ];
+    const expected_files = [`${name}-Info-${date_string}.log`, `${name}-Debug-${date_string}.log`];
     // wait a bit for files to be written
     setTimeout(() => {
       const files = fs.readdirSync(LOG_FILE_DIRECTORY);
@@ -308,14 +287,8 @@ describe('Profiler', () => {
     const timeout_dur = 500;
     setTimeout(() => {
       const time = p0.stop();
-      assert(
-        time >= timeout_dur,
-        'Profiler 0 duration is not shorter than expected'
-      );
-      assert(
-        time <= timeout_dur + 100,
-        'Profiler 0 duration is not longer than expected'
-      );
+      assert(time >= timeout_dur, 'Profiler 0 duration is not shorter than expected');
+      assert(time <= timeout_dur + 100, 'Profiler 0 duration is not longer than expected');
       assert(time === p0.stop(), 'Calling stop again returns same duration');
 
       p1.stop({ message: 'with message' });

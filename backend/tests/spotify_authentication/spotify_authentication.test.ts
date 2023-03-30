@@ -3,9 +3,7 @@ import sinon from 'sinon';
 
 import * as SpotifyWebApi from '../../src/spotify_authentication/spotify_api_import';
 
-import createSpotifyAuthenticator, {
-  AuthRequest,
-} from '../../src/spotify_authentication/spotify_authentication';
+import createSpotifyAuthenticator, { AuthRequest } from '../../src/spotify_authentication/spotify_authentication';
 import Logger from '../../src/logger/logger';
 
 describe('Spotify Authentication Middleware', () => {
@@ -29,9 +27,7 @@ describe('Spotify Authentication Middleware', () => {
       };
     });
 
-    const spotifyAuthentication = createSpotifyAuthenticator(
-      new Logger('Test')
-    );
+    const spotifyAuthentication = createSpotifyAuthenticator(new Logger('Test'));
 
     const req = {
       headers: {},
@@ -71,9 +67,7 @@ describe('Spotify Authentication Middleware', () => {
       };
     });
 
-    const spotifyAuthentication = createSpotifyAuthenticator(
-      new Logger('Test')
-    );
+    const spotifyAuthentication = createSpotifyAuthenticator(new Logger('Test'));
 
     const req = {
       headers: {},
@@ -112,9 +106,7 @@ describe('Spotify Authentication Middleware', () => {
       };
     });
 
-    const spotifyAuthentication = createSpotifyAuthenticator(
-      new Logger('Test')
-    );
+    const spotifyAuthentication = createSpotifyAuthenticator(new Logger('Test'));
 
     const req = {
       headers: {},
@@ -150,9 +142,7 @@ describe('Spotify Authentication Middleware', () => {
       };
     });
 
-    const spotifyAuthentication = createSpotifyAuthenticator(
-      new Logger('Test')
-    );
+    const spotifyAuthentication = createSpotifyAuthenticator(new Logger('Test'));
 
     const req = {
       headers: {},

@@ -21,11 +21,7 @@ export default class SQLiteInterface {
    * ex. { name: "Test", cols: "(col1 STRING, col2 STRING)" } creates a table named test with 2 columns named col1 and col2
    * @param logger - logger
    */
-  constructor(
-    database_path: string,
-    tables: Array<{ name: string; cols: string }>,
-    logger: Logger
-  ) {
+  constructor(database_path: string, tables: Array<{ name: string; cols: string }>, logger: Logger) {
     this.log_ = logger;
     this.initializeDatabase_(database_path, tables);
   }
@@ -57,12 +53,7 @@ export default class SQLiteInterface {
         level: 'warn',
         level_thresholds: { warn: 1000, error: 5000 },
       });
-      this.log_.warn(
-        `Error while running SQL {cmd: ${cmd}} with {param:${JSON.stringify(
-          params
-        )}}`,
-        error
-      );
+      this.log_.warn(`Error while running SQL {cmd: ${cmd}} with {param:${JSON.stringify(params)}}`, error);
       throw error;
     }
   }
@@ -96,12 +87,7 @@ export default class SQLiteInterface {
         level: 'warn',
         level_thresholds: { warn: 1000, error: 5000 },
       });
-      this.log_.warn(
-        `Error while fetching rows with SQL {cmd: ${cmd}} with {param:${JSON.stringify(
-          params
-        )}}`,
-        error
-      );
+      this.log_.warn(`Error while fetching rows with SQL {cmd: ${cmd}} with {param:${JSON.stringify(params)}}`, error);
       throw error;
     }
   }
@@ -126,19 +112,14 @@ export default class SQLiteInterface {
    * ex. { name: "Test", cols: "(col1 STRING, col2 STRING)" } creates a table named test with 2 columns named col1 and col2
    * @returns - promise that resolves once tables are created
    */
-  private async createTables(
-    tables: Array<{ name: string; cols: string }>
-  ): Promise<void> {
+  private async createTables(tables: Array<{ name: string; cols: string }>): Promise<void> {
     for (let i = 0; i < tables.length; i++) {
       try {
         await new Promise<void>((resolve, reject) => {
-          this.db_.run(
-            `CREATE TABLE ${tables[i].name} ${tables[i].cols}`,
-            (error) => {
-              if (error) return reject(error);
-              resolve();
-            }
-          );
+          this.db_.run(`CREATE TABLE ${tables[i].name} ${tables[i].cols}`, (error) => {
+            if (error) return reject(error);
+            resolve();
+          });
         });
       } catch (error) {
         this.log_.error(`Error creating table: ${tables[i].name}.`, error);
@@ -153,10 +134,7 @@ export default class SQLiteInterface {
    * @param tables - array of tables to create (runs commands in the format: "CREATE TABLE ${name} ${cols}")
    * ex. { name: "Test", cols: "(col1 STRING, col2 STRING)" } creates a table named test with 2 columns named col1 and col2
    */
-  private initializeDatabase_(
-    database_path: string,
-    tables: Array<{ name: string; cols: string }>
-  ): void {
+  private initializeDatabase_(database_path: string, tables: Array<{ name: string; cols: string }>): void {
     const profile = this.log_.profile('Initialize Database');
 
     this.ready_ = new Promise((res, rej) => {
@@ -178,10 +156,7 @@ export default class SQLiteInterface {
         existed = fs.existsSync(database_path);
       } catch (error) {
         reject(error);
-        this.log_.fatal(
-          'Error while checking if database existed already',
-          error
-        );
+        this.log_.fatal('Error while checking if database existed already', error);
         return;
       }
 
@@ -191,15 +166,11 @@ export default class SQLiteInterface {
 
           // if database exists, just open it, don't initalize
           if (existed) {
-            this.log_.debug(
-              `Database at ${database_path} exists, skipping initialization`
-            );
+            this.log_.debug(`Database at ${database_path} exists, skipping initialization`);
             return resolve();
           }
 
-          this.log_.debug(
-            `Database at ${database_path} did not exist, initializating`
-          );
+          this.log_.debug(`Database at ${database_path} did not exist, initializating`);
           this.createTables(tables)
             .then(() => {
               resolve();
@@ -210,10 +181,7 @@ export default class SQLiteInterface {
             });
         })
         .catch((error) => {
-          this.log_.fatal(
-            `Failed to open database at: ${database_path}`,
-            error
-          );
+          this.log_.fatal(`Failed to open database at: ${database_path}`, error);
           reject(error);
         });
     });

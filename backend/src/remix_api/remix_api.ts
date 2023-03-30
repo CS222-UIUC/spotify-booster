@@ -8,10 +8,7 @@ import createSpotifyAuthenticator from '../spotify_authentication/spotify_authen
 import createRemixesRouter from './remix_api_remixes';
 import createTracksRouter from './remix_api_tracks';
 
-export default function createRemixRouter(
-  log: Logger,
-  db_location: string
-): express.Router {
+export default function createRemixRouter(log: Logger, db_location: string): express.Router {
   const db = new DatabaseInterface(db_location);
 
   const router = express.Router();

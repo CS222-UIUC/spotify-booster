@@ -9,12 +9,7 @@ import Logger from '../logger/logger';
  */
 export default function createWebLogger(log: Logger) {
   // logs error from express
-  function webLogError(
-    error: Error,
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
+  function webLogError(error: Error, req: Request, res: Response, next: NextFunction) {
     const path = req.originalUrl;
     const from_ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 

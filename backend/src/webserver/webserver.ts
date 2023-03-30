@@ -82,12 +82,5 @@ export default function StartWebServer(
 ) {
   const logger = new Logger('Webserver');
   const webserver = createHTTPServer(logger, port);
-  return createExpressApp(
-    webserver,
-    logger,
-    db_location,
-    static_path,
-    index_path,
-    allow_cors
-  );
+  return createExpressApp(webserver, logger, db_location, static_path, index_path, allow_cors);
 }

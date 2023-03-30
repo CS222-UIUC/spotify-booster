@@ -13,12 +13,7 @@ const SPOTIFY_REDIRECT_URL = process.env.SPOTIFY_REDIRECT_URL;
  * @returns - if string is empty or not
  */
 function isEmpty(str: string): boolean {
-  return (
-    str === null ||
-    str === undefined ||
-    str.match(/^\s*$/) !== null ||
-    str === ''
-  );
+  return str === null || str === undefined || str.match(/^\s*$/) !== null || str === '';
 }
 
 /**
@@ -71,11 +66,7 @@ export interface AuthRequest extends Request {
  * @returns - Express middleware for authenticating spotify users (sets req.spotify_uid to be a spotify_uid string)
  */
 export default function createSpotifyAuthenticator(log: Logger) {
-  async function spotifyAuthentication(
-    req: AuthRequest,
-    res: Response,
-    next: NextFunction
-  ) {
+  async function spotifyAuthentication(req: AuthRequest, res: Response, next: NextFunction) {
     const from_ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
     let spotify_access_token: string;

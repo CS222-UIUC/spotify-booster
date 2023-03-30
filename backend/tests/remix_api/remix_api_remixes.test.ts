@@ -15,11 +15,7 @@ const DB_LOCATION = path.join(__dirname, 'test.db');
  */
 async function disableAuth() {
   sinon.stub(spotifyAuth, 'default').callsFake(() => {
-    return async function (
-      req: spotifyAuth.AuthRequest,
-      res: Response,
-      next: NextFunction
-    ) {
+    return async function (req: spotifyAuth.AuthRequest, res: Response, next: NextFunction) {
       req.spotify_uid = 'spotify_uid';
       next();
     };
@@ -54,26 +50,16 @@ describe('Remix API Create Remix', () => {
 
     const remix_name = 'text_remix';
     const req0 = request(app);
-    const response0 = await req0.post(
-      `/remixapi/createRemix?name=${remix_name}`
-    );
+    const response0 = await req0.post(`/remixapi/createRemix?name=${remix_name}`);
 
     assert(response0.statusCode === 200, 'Responds with success status code');
-    assert(
-      response0.body.remix_id !== '',
-      'Does not respond with empty remix_id'
-    );
+    assert(response0.body.remix_id !== '', 'Does not respond with empty remix_id');
 
     const req1 = request(app);
-    const response1 = await req1.get(
-      `/remixapi/getRemixName?remix_id=${response0.body.remix_id}`
-    );
+    const response1 = await req1.get(`/remixapi/getRemixName?remix_id=${response0.body.remix_id}`);
 
     assert(response1.statusCode === 200, 'Responds with success status code');
-    assert(
-      response1.body.name === remix_name,
-      'Remix was created and accessable'
-    );
+    assert(response1.body.name === remix_name, 'Remix was created and accessable');
   });
 
   it('refuses to create remix with invalid name', async () => {
@@ -86,10 +72,7 @@ describe('Remix API Create Remix', () => {
     const response = await req.post('/remixapi/createRemix');
 
     assert(response.statusCode === 400, 'Responds with bad request code');
-    assert(
-      response.body.error_message === 'Invalid Remix Name',
-      'Responds with error message'
-    );
+    assert(response.body.error_message === 'Invalid Remix Name', 'Responds with error message');
   });
 });
 
@@ -102,16 +85,12 @@ describe('Remix API Edit Remix Name', () => {
     const { remix_id, app } = await createRemix();
 
     const new_name = 'new_remix_name';
-    const response1 = await request(app).put(
-      `/remixapi/setRemixName?remix_id=${remix_id}&name=${new_name}`
-    );
+    const response1 = await request(app).put(`/remixapi/setRemixName?remix_id=${remix_id}&name=${new_name}`);
 
     assert(response1.statusCode === 200, 'Responds with success status code');
 
     const req2 = request(app);
-    const response2 = await req2.get(
-      `/remixapi/getRemixName?remix_id=${remix_id}`
-    );
+    const response2 = await req2.get(`/remixapi/getRemixName?remix_id=${remix_id}`);
 
     assert(response2.body.name === new_name, 'Remix was edited');
   });
@@ -120,15 +99,10 @@ describe('Remix API Edit Remix Name', () => {
     const { remix_id, app } = await createRemix();
 
     const new_name = '';
-    const response = await request(app).put(
-      `/remixapi/setRemixName?remix_id=${remix_id}&name=${new_name}`
-    );
+    const response = await request(app).put(`/remixapi/setRemixName?remix_id=${remix_id}&name=${new_name}`);
 
     assert(response.statusCode === 400, 'Responds with bad request code');
-    assert(
-      response.body.error_message === 'Invalid Remix Name',
-      'Responds with error message'
-    );
+    assert(response.body.error_message === 'Invalid Remix Name', 'Responds with error message');
   });
 
   it('refuses to edit remix with invalid remix_id', async () => {
@@ -136,15 +110,10 @@ describe('Remix API Edit Remix Name', () => {
     const remix_id = 'invalid';
 
     const new_name = 'valid_name';
-    const response = await request(app).put(
-      `/remixapi/setRemixName?remix_id=${remix_id}&name=${new_name}`
-    );
+    const response = await request(app).put(`/remixapi/setRemixName?remix_id=${remix_id}&name=${new_name}`);
 
     assert(response.statusCode === 400, 'Responds with bad request code');
-    assert(
-      response.body.error_message === 'Invalid Remix Id',
-      'Responds with error message'
-    );
+    assert(response.body.error_message === 'Invalid Remix Id', 'Responds with error message');
   });
 });
 
@@ -156,40 +125,26 @@ describe('Remix API Delete Remix', () => {
   it('deletes remix with valid id', async () => {
     const { remix_id, app } = await createRemix();
 
-    const response1 = await request(app).delete(
-      `/remixapi/deleteRemix?remix_id=${remix_id}`
-    );
+    const response1 = await request(app).delete(`/remixapi/deleteRemix?remix_id=${remix_id}`);
 
     assert(response1.statusCode === 200, 'Responds with success status code');
 
-    const response2 = await request(app).get(
-      `/remixapi/getRemixName?remix_id=${remix_id}`
-    );
+    const response2 = await request(app).get(`/remixapi/getRemixName?remix_id=${remix_id}`);
 
     assert(response2.statusCode === 400, 'Remix no longer exists');
-    assert(
-      response2.body.error_message === 'Invalid Remix Id',
-      'Responds with error message'
-    );
+    assert(response2.body.error_message === 'Invalid Remix Id', 'Responds with error message');
   });
 
   it('refuses to delete remix with invalid remix_id', async () => {
     const { remix_id, app } = await createRemix();
 
     const invalid_remix_id = 'invalid';
-    const response1 = await request(app).delete(
-      `/remixapi/deleteRemix?remix_id=${invalid_remix_id}`
-    );
+    const response1 = await request(app).delete(`/remixapi/deleteRemix?remix_id=${invalid_remix_id}`);
 
     assert(response1.statusCode === 400, 'Responds with bad request code');
-    assert(
-      response1.body.error_message === 'Invalid Remix Id',
-      'Responds with error message'
-    );
+    assert(response1.body.error_message === 'Invalid Remix Id', 'Responds with error message');
 
-    const response2 = await request(app).get(
-      `/remixapi/getRemixName?remix_id=${remix_id}`
-    );
+    const response2 = await request(app).get(`/remixapi/getRemixName?remix_id=${remix_id}`);
 
     assert(response2.statusCode === 200, 'Remix still exists');
   });

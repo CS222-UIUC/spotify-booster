@@ -22,7 +22,7 @@
     "build": "tsc --build",
     "clean": "tsc --build --clean",
     "pretest": "npm run build",
-    "test": "mocha --require source-map-support/register ./build/**/*test.js",
+    "test": "mocha --require source-map-support/register --file ./build/tests/test_utils/hooks/global_hooks.test.js ./build/**/*test.js",
     "posttest": "npm run lint",
     "coverage": "nyc npm test",
     "prestart": "npm run build",

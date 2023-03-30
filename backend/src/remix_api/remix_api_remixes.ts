@@ -10,10 +10,7 @@ import Logger from '../logger/logger';
  * @param db - database interface for remixes and tracks
  * @returns - Express router
  */
-export default function createRemixesRouter(
-  log: Logger,
-  db: DatabaseInterface
-) {
+export default function createRemixesRouter(log: Logger, db: DatabaseInterface) {
   const router = express.Router();
 
   router.get('/remixapi/getRemixName', async (req, res) => {

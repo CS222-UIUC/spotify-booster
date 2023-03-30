@@ -46,11 +46,7 @@ function unique_database_name() {
  * @param comparator - function to compare elements, defaults to ===
  * @returns - If arrays match without regard to order
  */
-export default function arraysMatchUnordered<T>(
-  a: Array<T>,
-  b: Array<T>,
-  comparator?: (a: T, b: T) => boolean
-): boolean {
+export default function arraysMatchUnordered<T>(a: Array<T>, b: Array<T>, comparator?: (a: T, b: T) => boolean): boolean {
   if (!comparator) {
     comparator = (a, b) => {
       return a === b;
@@ -59,7 +55,7 @@ export default function arraysMatchUnordered<T>(
   if (a.length !== b.length) return false;
   for (let i = 0; i < a.length; i++) {
     let found = false;
-    for (let j = 0; j < b.length; j++) {
+    for (let j = 0; j < b.length && !found; j++) {
       if (comparator(a[i], b[j])) {
         found = true;
         break;
@@ -78,20 +74,8 @@ describe('SQLite Interface', () => {
         cols: '(col1 STRING, col2 INT)',
       },
     ];
-    const db_location = path.join(
-      __dirname,
-      '..',
-      '..',
-      '..',
-      'tests',
-      'sqlite_interface',
-      'sqlite_interface.test.db'
-    );
-    const sqlite_interface = new SQLiteInterfaceTester(
-      db_location,
-      tables,
-      new Logger('Test SQLiteInterface')
-    );
+    const db_location = path.join(__dirname, '..', '..', '..', 'tests', 'sqlite_interface', 'sqlite_interface.test.db');
+    const sqlite_interface = new SQLiteInterfaceTester(db_location, tables, new Logger('Test SQLiteInterface'));
 
     const rows = await sqlite_interface.dbAll('SELECT * FROM test_table', {});
 
@@ -101,11 +85,7 @@ describe('SQLite Interface', () => {
       { col1: 'a string', col2: 2 },
     ];
     assert(
-      arraysMatchUnordered<(typeof expected_rows)[0]>(
-        expected_rows,
-        rows,
-        (a, b) => a.col1 === b.col1 && a.col2 === b.col2
-      ),
+      arraysMatchUnordered<(typeof expected_rows)[0]>(expected_rows, rows, (a, b) => a.col1 === b.col1 && a.col2 === b.col2),
       'Reads existing database correctly'
     );
 
@@ -124,28 +104,17 @@ describe('SQLite Interface', () => {
       },
     ];
     const db_location = path.join(TEMP_FILE_DIRECTORY, unique_database_name());
-    const sqlite_interface = new SQLiteInterfaceTester(
-      db_location,
-      tables,
-      new Logger('Test SQLiteInterface')
-    );
+    const sqlite_interface = new SQLiteInterfaceTester(db_location, tables, new Logger('Test SQLiteInterface'));
 
-    await sqlite_interface.dbRun(
-      'INSERT INTO test_table0 VALUES ($col1, $col2)',
-      {
-        $col1: 'some string',
-        $col2: '0',
-      }
-    );
+    await sqlite_interface.dbRun('INSERT INTO test_table0 VALUES ($col1, $col2)', {
+      $col1: 'some string',
+      $col2: '0',
+    });
 
     const rows = await sqlite_interface.dbAll('SELECT * FROM test_table0', {});
     const expected_rows = [{ col1: 'some string', col2: 0 }];
     assert(
-      arraysMatchUnordered(
-        expected_rows,
-        rows,
-        (a, b) => a.col1 === b.col1 && a.col2 === b.col2
-      ),
+      arraysMatchUnordered(expected_rows, rows, (a, b) => a.col1 === b.col1 && a.col2 === b.col2),
       'Writes to new database correctly'
     );
 
@@ -155,24 +124,10 @@ describe('SQLite Interface', () => {
   });
 
   it('rejects ready if it fails to open database', async () => {
-    sinon
-      .stub(sqlite3, 'Database')
-      .yields(new Error('Failed to Open Database'));
+    sinon.stub(sqlite3, 'Database').yields(new Error('Failed to Open Database'));
 
-    const db_location = path.join(
-      __dirname,
-      '..',
-      '..',
-      '..',
-      'tests',
-      'sqlite_interface',
-      'sqlite_interface.test.db'
-    );
-    const sqlite_interface = new SQLiteInterfaceTester(
-      db_location,
-      [],
-      new Logger('Test SQLiteInterface')
-    );
+    const db_location = path.join(__dirname, '..', '..', '..', 'tests', 'sqlite_interface', 'sqlite_interface.test.db');
+    const sqlite_interface = new SQLiteInterfaceTester(db_location, [], new Logger('Test SQLiteInterface'));
 
     await assert.isRejected(sqlite_interface.ready, 'Failed to Open Database');
   });
@@ -198,26 +153,16 @@ describe('SQLite Interface', () => {
       },
     ];
     const db_location = path.join(TEMP_FILE_DIRECTORY, unique_database_name());
-    const sqlite_interface = new SQLiteInterfaceTester(
-      db_location,
-      tables,
-      new Logger('Test SQLiteInterface')
-    );
+    const sqlite_interface = new SQLiteInterfaceTester(db_location, tables, new Logger('Test SQLiteInterface'));
 
     await assert.isRejected(sqlite_interface.ready, 'Failed to Run Command');
   });
 
   it('rejected ready if error occurs while checking database exists already or not', async () => {
-    sinon
-      .stub(fs, 'existsSync')
-      .callsFake(sinon.fake.throws('Failed to Check Exists'));
+    sinon.stub(fs, 'existsSync').callsFake(sinon.fake.throws('Failed to Check Exists'));
 
     const db_location = path.join(TEMP_FILE_DIRECTORY, unique_database_name());
-    const sqlite_interface = new SQLiteInterfaceTester(
-      db_location,
-      [],
-      new Logger('Test SQLiteInterface')
-    );
+    const sqlite_interface = new SQLiteInterfaceTester(db_location, [], new Logger('Test SQLiteInterface'));
 
     await assert.isRejected(sqlite_interface.ready, 'Failed to Check Exists');
   });
@@ -233,17 +178,10 @@ describe('SQLite Interface', () => {
       };
     });
     const db_location = path.join(TEMP_FILE_DIRECTORY, unique_database_name());
-    const sqlite_interface = new SQLiteInterfaceTester(
-      db_location,
-      [],
-      new Logger('Test SQLiteInterface')
-    );
+    const sqlite_interface = new SQLiteInterfaceTester(db_location, [], new Logger('Test SQLiteInterface'));
 
     await assert.isRejected(
-      sqlite_interface.dbRun(
-        'CREATE TABLE test_table (col1 STRING, col2 INT)',
-        {}
-      ),
+      sqlite_interface.dbRun('CREATE TABLE test_table (col1 STRING, col2 INT)', {}),
       'Failed to Run Command'
     );
   });
@@ -259,17 +197,10 @@ describe('SQLite Interface', () => {
       };
     });
     const db_location = path.join(TEMP_FILE_DIRECTORY, unique_database_name());
-    const sqlite_interface = new SQLiteInterfaceTester(
-      db_location,
-      [],
-      new Logger('Test SQLiteInterface')
-    );
+    const sqlite_interface = new SQLiteInterfaceTester(db_location, [], new Logger('Test SQLiteInterface'));
 
     await assert.isRejected(
-      sqlite_interface.dbAll(
-        'SELECT count(*) FROM sqlite_master WHERE type = "table"',
-        {}
-      ),
+      sqlite_interface.dbAll('SELECT count(*) FROM sqlite_master WHERE type = "table"', {}),
       'Failed to Fetch All'
     );
   });
@@ -284,11 +215,7 @@ describe('SQLite Interface', () => {
       };
     });
     const db_location = path.join(TEMP_FILE_DIRECTORY, unique_database_name());
-    const sqlite_interface = new SQLiteInterfaceTester(
-      db_location,
-      [],
-      new Logger('Test SQLiteInterface')
-    );
+    const sqlite_interface = new SQLiteInterfaceTester(db_location, [], new Logger('Test SQLiteInterface'));
 
     await assert.isRejected(sqlite_interface.close(), 'Failed to Close');
   });

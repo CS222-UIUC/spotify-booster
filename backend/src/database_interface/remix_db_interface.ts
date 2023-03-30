@@ -16,10 +16,7 @@ export default class RemixDBInterface extends SQLiteInterface {
    */
   private generateRemixId_(): string {
     this.remix_id_gen_++;
-    return crypto
-      .createHash('sha256')
-      .update(this.remix_id_gen_.toString())
-      .digest('base64url');
+    return crypto.createHash('sha256').update(this.remix_id_gen_.toString()).digest('base64url');
   }
 
   /**
@@ -28,12 +25,7 @@ export default class RemixDBInterface extends SQLiteInterface {
    * @returns - if string is empty or not
    */
   protected isEmpty(str: string): boolean {
-    return (
-      str === null ||
-      str === undefined ||
-      str.match(/^\s*$/) !== null ||
-      str === ''
-    );
+    return str === null || str === undefined || str.match(/^\s*$/) !== null || str === '';
   }
 
   /**
@@ -57,9 +49,7 @@ export default class RemixDBInterface extends SQLiteInterface {
    */
   async createRemix(name: string): Promise<string> {
     const remix_id = this.generateRemixId_();
-    this.log_.debug(
-      `Creating new remix with name ${name} and remix_id ${remix_id}`
-    );
+    this.log_.debug(`Creating new remix with name ${name} and remix_id ${remix_id}`);
 
     // check for invalid name
     if (this.isEmpty(name)) {
@@ -82,18 +72,13 @@ export default class RemixDBInterface extends SQLiteInterface {
    */
   async getRemixName(remix_id: string): Promise<string> {
     // fetch from database
-    const rows = (await this.dbAll(
-      'SELECT name FROM remixes WHERE remix_id = $remix_id;',
-      {
-        $remix_id: remix_id,
-      }
-    )) as Array<{ name: string; remix_id: string }>;
+    const rows = (await this.dbAll('SELECT name FROM remixes WHERE remix_id = $remix_id;', {
+      $remix_id: remix_id,
+    })) as Array<{ name: string; remix_id: string }>;
 
     // reject if no remixes found
     if (rows.length === 0) {
-      this.log_.warn(
-        `Remix with remix_id ${remix_id} not found, assuming invalid remix_id`
-      );
+      this.log_.warn(`Remix with remix_id ${remix_id} not found, assuming invalid remix_id`);
       return Promise.reject(new Error('Invalid Remix Id'));
     }
 
@@ -107,9 +92,7 @@ export default class RemixDBInterface extends SQLiteInterface {
    * @returns Promise resolving to nothing if remix id is valid (rejected if an error occurs)
    */
   async setRemixName(remix_id: string, new_name: string): Promise<void> {
-    this.log_.debug(
-      `Updating remix with remix_id ${remix_id} with name ${new_name}`
-    );
+    this.log_.debug(`Updating remix with remix_id ${remix_id} with name ${new_name}`);
 
     await this.remixExists(remix_id);
 
@@ -119,13 +102,10 @@ export default class RemixDBInterface extends SQLiteInterface {
       return Promise.reject(new Error('Invalid Remix Name'));
     }
 
-    await this.dbRun(
-      'UPDATE remixes SET name = $name WHERE remix_id = $remix_id;',
-      {
-        $remix_id: remix_id,
-        $name: new_name.trim(), // make sure to trim name
-      }
-    );
+    await this.dbRun('UPDATE remixes SET name = $name WHERE remix_id = $remix_id;', {
+      $remix_id: remix_id,
+      $name: new_name.trim(), // make sure to trim name
+    });
   }
 
   /**
@@ -148,10 +128,7 @@ export default class RemixDBInterface extends SQLiteInterface {
    * @returns Promise resolving to number of remixes in database (rejected if an error occurs)
    */
   async remixCount(): Promise<number> {
-    const rows = (await this.dbAll(
-      'SELECT COUNT(1) FROM remixes;',
-      {}
-    )) as Array<{ 'COUNT(1)': number }>;
+    const rows = (await this.dbAll('SELECT COUNT(1) FROM remixes;', {})) as Array<{ 'COUNT(1)': number }>;
     return rows[0]['COUNT(1)'];
   }
 }

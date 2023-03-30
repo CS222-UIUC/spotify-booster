@@ -51,8 +51,7 @@ class Profiler {
     let level = 'debug';
     if (options && options.level_thresholds) {
       if (this.duration_ >= options.level_thresholds.fatal) level = 'fatal';
-      else if (this.duration_ >= options.level_thresholds.error)
-        level = 'error';
+      else if (this.duration_ >= options.level_thresholds.error) level = 'error';
       else if (this.duration_ >= options.level_thresholds.warn) level = 'warn';
       else if (this.duration_ >= options.level_thresholds.info) level = 'info';
       else level = 'debug';

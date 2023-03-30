@@ -10,7 +10,6 @@ import { createLoggerStub, stubLogger } from '../test_utils/stubs/stub_logger.te
 import uniqueID from '../test_utils/unique_id.test';
 
 import { matchTestRow, SQLiteInterfaceTester } from './sqlite_interface_test_utils.test';
-import Logger from '../../src/logger/logger';
 
 const TEST_DB_DIRECTORY = path.join(__dirname, 'test_track_db_interface');
 
@@ -40,7 +39,7 @@ describe('SQLite Interface', () => {
         },
       ];
       const db_location = path.join(TEST_DB_DIRECTORY, uniqueID());
-      const sqlite_interface = new SQLiteInterfaceTester(db_location, tables, new Logger('Test SQLiteInterface'));
+      const sqlite_interface = new SQLiteInterfaceTester(db_location, tables, createLoggerStub());
 
       await sqlite_interface.dbRun('INSERT INTO test_table0 VALUES ($col1, $col2)', {
         $col1: 'some string',
@@ -66,7 +65,7 @@ describe('SQLite Interface', () => {
         },
       ];
       const db_location = path.join(__dirname, '..', '..', '..', 'tests', 'sqlite_interface', 'sqlite_interface.test.db');
-      const sqlite_interface = new SQLiteInterfaceTester(db_location, tables, new Logger('Test SQLiteInterface'));
+      const sqlite_interface = new SQLiteInterfaceTester(db_location, tables, createLoggerStub());
 
       const rows = await sqlite_interface.dbAll('SELECT * FROM test_table', {});
       const expected_rows = [

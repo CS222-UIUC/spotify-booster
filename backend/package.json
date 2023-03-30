@@ -2,7 +2,7 @@
   "name": "spotify-booster-backend",
   "version": "1.0.0",
   "description": "Backend code for Spotify Booster",
-  "main": "./build/index.js",
+  "main": "./build/src/index.js",
   "directories": {},
   "//": [
     "lint: run eslint to check code style",
@@ -26,7 +26,7 @@
     "posttest": "npm run lint",
     "coverage": "nyc npm test",
     "prestart": "npm run build",
-    "start": "node ./build/index.js"
+    "start": "node ./build/src/index.js"
   },
   "repository": {
     "type": "git",

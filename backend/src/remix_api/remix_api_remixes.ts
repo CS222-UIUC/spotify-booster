@@ -2,6 +2,7 @@ import express from 'express';
 
 import DatabaseInterface from '../database_interface/database_interface';
 import Logger from '../logger/logger';
+import { AuthRequest } from '../spotify_authentication/spotify_authentication';
 
 /**
  * createRemixesRouter() - Returns router for remix part of remix api

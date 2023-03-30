@@ -1,12 +1,30 @@
 import { assert } from 'chai';
 import request from 'supertest';
 import path from 'path';
-import express from 'express';
+import express, { Response, NextFunction } from 'express';
+import sinon from 'sinon';
 
 import createRemixRouter from './remix_api';
 import Logger from '../logger/logger';
+import * as spotifyAuth from '../spotify_authentication/spotify_authentication';
 
 const DB_LOCATION = path.join(__dirname, 'test.db');
+
+/**
+ * disableAuth() - disables spotify authentication by stubbing spotify authentication middleware
+ */
+async function disableAuth() {
+  sinon.stub(spotifyAuth, 'default').callsFake(() => {
+    return async function (
+      req: spotifyAuth.AuthRequest,
+      res: Response,
+      next: NextFunction
+    ) {
+      req.spotify_uid = 'spotify_uid';
+      next();
+    };
+  });
+}
 
 /**
  * createRemix() - sends post request to create a remix and returns its id
@@ -24,6 +42,10 @@ async function createRemix() {
 }
 
 describe('Remix API Create Remix', () => {
+  beforeEach(() => {
+    disableAuth();
+  });
+
   it('creates remix with valid name', async () => {
     const log = new Logger('Test');
     const router = createRemixRouter(log, DB_LOCATION);
@@ -72,6 +94,10 @@ describe('Remix API Create Remix', () => {
 });
 
 describe('Remix API Edit Remix Name', () => {
+  beforeEach(() => {
+    disableAuth();
+  });
+
   it('edits remix with valid name', async () => {
     const { remix_id, app } = await createRemix();
 
@@ -123,6 +149,10 @@ describe('Remix API Edit Remix Name', () => {
 });
 
 describe('Remix API Delete Remix', () => {
+  beforeEach(() => {
+    disableAuth();
+  });
+
   it('deletes remix with valid id', async () => {
     const { remix_id, app } = await createRemix();
 

@@ -17,7 +17,7 @@ export default function createRemixRouter(
   const router = express.Router();
 
   router.use(cookieParser());
-  router.use(createSpotifyAuthenticator(log));
+  router.use('/remixapi/', createSpotifyAuthenticator(log));
   router.use(createRemixesRouter(log, db));
   router.use(createTracksRouter(log, db));
 

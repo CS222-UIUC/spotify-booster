@@ -18,5 +18,5 @@
   "include": [
     "src/**/*.ts",
     "test/**/*.ts"
-  ]
+, "tests/webserver/webserver.test.ts", "tests/spotify_authentication/spotify_authentication.test.ts", "tests/remix_api/remix_api_tracks.test.ts", "tests/remix_api/remix_api_remixes.test.ts", "tests/sqlite_interface/sqlite_interface_test_utils.test.ts", "tests/sqlite_interface/sqlite_interface.test.ts", "tests/database_interface/database_interface.test.ts", "tests/database_interface/remix_db_interface.test.ts", "tests/database_interface/track_db_interface.test.ts", "tests/logger/logger.test.ts"  ]
 }

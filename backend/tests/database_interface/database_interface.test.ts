@@ -2,7 +2,7 @@ import { assert } from 'chai';
 import fs from 'fs-extra';
 import path from 'path';
 
-import DatabaseInterface from './database_interface';
+import DatabaseInterface from '../../src/database_interface/database_interface';
 import { arrays_match_unordered } from './track_db_interface.test';
 
 const TEMP_FILE_DIRECTORY = path.join(__dirname, 'test_databases');
@@ -58,7 +58,8 @@ describe('Existing Database Initialization', () => {
       __dirname,
       '..',
       '..',
-      'src',
+      '..',
+      'tests',
       'database_interface',
       'database_interface.test.db'
     );

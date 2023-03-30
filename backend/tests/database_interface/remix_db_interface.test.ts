@@ -3,7 +3,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import crypto from 'crypto';
 
-import DatabaseInterface from './database_interface';
+import DatabaseInterface from '../../src/database_interface/database_interface';
 
 const TEMP_FILE_DIRECTORY = path.join(__dirname, 'test_databases');
 

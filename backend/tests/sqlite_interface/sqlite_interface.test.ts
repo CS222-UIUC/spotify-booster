@@ -7,7 +7,7 @@ import fs from 'fs-extra';
 
 import { SQLiteInterfaceTester } from './sqlite_interface_test_utils.test';
 import sqlite3 from 'sqlite3';
-import Logger from '../logger/logger';
+import Logger from '../../src/logger/logger';
 
 const TEMP_FILE_DIRECTORY = path.join(__dirname, 'test_databases');
 
@@ -82,7 +82,8 @@ describe('SQLite Interface', () => {
       __dirname,
       '..',
       '..',
-      'src',
+      '..',
+      'tests',
       'sqlite_interface',
       'sqlite_interface.test.db'
     );
@@ -162,7 +163,8 @@ describe('SQLite Interface', () => {
       __dirname,
       '..',
       '..',
-      'src',
+      '..',
+      'tests',
       'sqlite_interface',
       'sqlite_interface.test.db'
     );

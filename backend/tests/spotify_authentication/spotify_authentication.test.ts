@@ -1,12 +1,12 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 
-import * as SpotifyWebApi from './spotify_api_import';
+import * as SpotifyWebApi from '../../src/spotify_authentication/spotify_api_import';
 
 import createSpotifyAuthenticator, {
   AuthRequest,
-} from './spotify_authentication';
-import Logger from '../logger/logger';
+} from '../../src/spotify_authentication/spotify_authentication';
+import Logger from '../../src/logger/logger';
 
 describe('Spotify Authentication Middleware', () => {
   it('allows request with valid token', async () => {

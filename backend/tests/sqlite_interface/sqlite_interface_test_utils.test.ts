@@ -1,5 +1,5 @@
 import { RunResult } from 'sqlite3';
-import SQLiteInterface from './sqlite_interface';
+import SQLiteInterface from '../../src/sqlite_interface/sqlite_interface';
 
 export class SQLiteInterfaceTester extends SQLiteInterface {
   async dbRun(cmd: string, params: object): Promise<RunResult> {

@@ -5,8 +5,8 @@ import path from 'path';
 import sinon from 'sinon';
 import express from 'express';
 
-import * as createRemixRouter from '../remix_api/remix_api';
-import * as Logger from '../logger/logger';
+import * as createRemixRouter from '../../src/remix_api/remix_api';
+import * as Logger from '../../src/logger/logger';
 
 const TEMP_FILE_DIRECTORY = path.join(__dirname, 'test_webserver');
 
@@ -17,7 +17,7 @@ const WEB_INDEX_PATH = path.join(TEMP_FILE_DIRECTORY, 'index.html');
 const TEST_URL = 'http://localhost:8888';
 
 // import after setting environment variables
-import StartWebServer from './webserver';
+import StartWebServer from '../../src/webserver/webserver';
 
 const test_index_file = `
 <!DOCTYPE html>

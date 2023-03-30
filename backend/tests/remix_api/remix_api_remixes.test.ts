@@ -4,9 +4,9 @@ import path from 'path';
 import express, { Response, NextFunction } from 'express';
 import sinon from 'sinon';
 
-import createRemixRouter from './remix_api';
-import Logger from '../logger/logger';
-import * as spotifyAuth from '../spotify_authentication/spotify_authentication';
+import createRemixRouter from '../../src/remix_api/remix_api';
+import Logger from '../../src/logger/logger';
+import * as spotifyAuth from '../../src/spotify_authentication/spotify_authentication';
 
 const DB_LOCATION = path.join(__dirname, 'test.db');
 

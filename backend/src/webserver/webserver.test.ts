@@ -81,7 +81,8 @@ describe('Basic Web Server', () => {
       DB_LOCATION,
       WEB_STATIC_PATH,
       WEB_INDEX_PATH,
-      WEB_PORT
+      WEB_PORT,
+      false
     );
 
     const req = request(TEST_URL);
@@ -104,7 +105,8 @@ describe('Basic Web Server', () => {
       DB_LOCATION,
       WEB_STATIC_PATH,
       WEB_INDEX_PATH,
-      WEB_PORT
+      WEB_PORT,
+      false
     );
 
     const req = request(TEST_URL);
@@ -127,7 +129,8 @@ describe('Basic Web Server', () => {
       DB_LOCATION,
       WEB_STATIC_PATH,
       WEB_INDEX_PATH,
-      WEB_PORT
+      WEB_PORT,
+      false
     );
     const req = request(TEST_URL);
     const response = await req.get('/subfolder/test_static1.js');
@@ -178,7 +181,8 @@ describe('Web Logger', () => {
       DB_LOCATION,
       WEB_STATIC_PATH,
       WEB_INDEX_PATH,
-      WEB_PORT
+      WEB_PORT,
+      false
     );
 
     const req = request(TEST_URL);
@@ -188,6 +192,51 @@ describe('Web Logger', () => {
     assert.throws(() => {
       throw spy.getCall(0).args[1];
     }, 'Some Error');
+
+    server.close();
+  });
+});
+
+describe('Allow CORS', () => {
+  it('calls CORS middleware', async () => {
+    const spy = sinon.spy();
+    sinon.stub(Logger, 'default').callsFake(() => {
+      return {
+        error: () => {
+          return;
+        },
+        debug: () => {
+          return;
+        },
+        info: spy,
+        warn: () => {
+          return;
+        },
+        fatal: () => {
+          return;
+        },
+        profile: () => {
+          return {
+            stop: () => {
+              return;
+            },
+          };
+        },
+      };
+    });
+
+    const server = StartWebServer(
+      DB_LOCATION,
+      WEB_STATIC_PATH,
+      WEB_INDEX_PATH,
+      WEB_PORT,
+      true
+    );
+
+    assert(
+      spy.calledWith('Enabling Cross-Origin Resource Sharing (CORS)'),
+      'CORS middleware is used'
+    );
 
     server.close();
   });

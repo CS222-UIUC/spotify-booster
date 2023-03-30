@@ -1,6 +1,7 @@
 import express from 'express';
 import http from 'http';
 import path from 'path';
+import cors from 'cors';
 
 import Logger from '../logger/logger';
 import createWebLogger from './web_logger';
@@ -36,12 +37,18 @@ function createExpressApp(
   log: Logger,
   db_location: string,
   static_path: string,
-  index_path: string
+  index_path: string,
+  allow_cors: boolean
 ) {
   const remix_api = createRemixRouter(log, db_location);
   const { webLogError, webLogger } = createWebLogger(log);
 
   const app = express();
+  if (allow_cors) {
+    log.info('Enabling Cross-Origin Resource Sharing (CORS)');
+    app.use(cors());
+  }
+
   app.use(express.static(static_path)); // setup static directory for webapp
   app.use(webLogger);
   app.use(remix_api);
@@ -70,7 +77,8 @@ export default function StartWebServer(
   db_location: string,
   static_path: string,
   index_path: string,
-  port: number
+  port: number,
+  allow_cors: boolean
 ) {
   const logger = new Logger('Webserver');
   const webserver = createHTTPServer(logger, port);
@@ -79,6 +87,7 @@ export default function StartWebServer(
     logger,
     db_location,
     static_path,
-    index_path
+    index_path,
+    allow_cors
   );
 }

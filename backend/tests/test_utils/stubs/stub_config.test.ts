@@ -6,6 +6,7 @@ import * as config from '../../../src/config/config';
  * @param new_config - new config to use
  */
 export default function stubConfig(new_config: {
+  env_config?: Partial<config.EnvironmentConfig>;
   logger_config?: Partial<config.LoggerConfig>;
   web_server_config?: Partial<config.WebServerConfig>;
   spotify_api_config?: Partial<config.SpotifyAPIConfig>;

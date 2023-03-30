@@ -1,195 +1,153 @@
 import { assert } from 'chai';
 import request from 'supertest';
-import fs from 'fs-extra';
 import path from 'path';
 import sinon from 'sinon';
 import express from 'express';
 
 import * as createRemixRouter from '../../src/remix_api/remix_api';
-import * as Logger from '../../src/logger/logger';
+import * as cors from '../../src/webserver/cors_import';
 
-const TEMP_FILE_DIRECTORY = path.join(__dirname, 'test_webserver');
+import StartWebServer from '../../src/webserver/webserver';
+import { createDirectory, removeDirectory } from '../test_utils/hooks/create_test_directory.test';
+import { stubLogger } from '../test_utils/stubs/stub_logger.test';
+import stubConfig from '../test_utils/stubs/stub_config.test';
+import {
+  createIndexFile,
+  createStaticFiles,
+  test_index_file,
+  test_static_file0,
+  test_static_file1,
+} from './webserver_utils.test';
+import uniqueID from '../test_utils/unique_id.test';
 
-const DB_LOCATION = path.join(TEMP_FILE_DIRECTORY, 'empty.db');
+const TEST_DIRECTORY = path.join(__dirname, 'test_web_server');
+const WEB_INDEX_PATH = path.join(TEST_DIRECTORY, 'index.html');
+const WEB_STATIC_PATH = path.join(TEST_DIRECTORY, 'static');
+
 const WEB_PORT = 8888;
-const WEB_STATIC_PATH = path.join(TEMP_FILE_DIRECTORY, 'static');
-const WEB_INDEX_PATH = path.join(TEMP_FILE_DIRECTORY, 'index.html');
 const TEST_URL = 'http://localhost:8888';
 
-// import after setting environment variables
-import StartWebServer from '../../src/webserver/webserver';
+describe('Web Server', () => {
+  before(() => {
+    createDirectory(TEST_DIRECTORY);
+    createIndexFile(WEB_INDEX_PATH);
+    createStaticFiles(WEB_STATIC_PATH);
+  });
 
-const test_index_file = `
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatsible" content="ie=edge">
-    <title>HTML 5 Boilerplate</title>
-    <link rel="stylesheet" href="style.css">
-  </head>
-  <body>
-	<script src="index.js"></script>
-  </body>
-</html>
-`;
+  beforeEach(function () {
+    this.logger_stub = stubLogger();
+    stubConfig({
+      web_server_config: {
+        port: WEB_PORT,
+        static_path: WEB_STATIC_PATH,
+        index_path: WEB_INDEX_PATH,
+      },
+      database_config: {
+        path: path.join(TEST_DIRECTORY, uniqueID()),
+      },
+    });
+  });
 
-const test_static_file0 = "console.log('Hello World');";
-const test_static_file1 = "console.log('Hello, World!');";
+  after(() => {
+    removeDirectory(TEST_DIRECTORY);
+  });
 
-// ensure empty temporary directory exists before running tests
-before(async () => {
-  try {
-    fs.mkdirSync(TEMP_FILE_DIRECTORY, { recursive: true });
-    fs.emptyDirSync(TEMP_FILE_DIRECTORY);
+  describe('Basic Web Server', () => {
+    beforeEach(async function () {
+      this.server = await StartWebServer();
+    });
 
-    fs.writeFileSync(WEB_INDEX_PATH, test_index_file);
+    afterEach(function (done) {
+      this.server.close(() => done());
+    });
 
-    fs.mkdirSync(WEB_STATIC_PATH, { recursive: true });
-    fs.writeFileSync(path.join(WEB_STATIC_PATH, 'test_static0.js'), test_static_file0);
+    it('returns index page at /index', async () => {
+      const req = request(TEST_URL);
+      const response = await req.get('/index');
 
-    fs.mkdirSync(path.join(WEB_STATIC_PATH, 'subfolder'));
-    fs.writeFileSync(path.join(WEB_STATIC_PATH, 'subfolder', 'test_static1.js'), test_static_file1);
-  } catch {
-    /* */
-  }
-});
+      assert.equal(response.text, test_index_file, 'Responds with correct index file');
+    });
 
-afterEach(() => {
-  sinon.restore();
-});
+    it('returns static content at /test_static0.js', async () => {
+      const req = request(TEST_URL);
+      const response = await req.get('/test_static0.js');
 
-// delete temporary directory after running tests
-after(async () => {
-  try {
-    fs.rmSync(TEMP_FILE_DIRECTORY, { recursive: true, force: true });
-  } catch {
-    /* */
-  }
-});
+      assert.equal(response.text, test_static_file0, 'Responds with correct static file');
+    });
 
-describe('Basic Web Server', () => {
-  it('returns index page at /index', async () => {
-    const server = StartWebServer(DB_LOCATION, WEB_STATIC_PATH, WEB_INDEX_PATH, WEB_PORT, false);
+    it('returns static content in a subfolder at /subfolder/test_static1.js', async () => {
+      const req = request(TEST_URL);
+      const response = await req.get('/subfolder/test_static1.js');
 
-    const req = request(TEST_URL);
-    const response = await req.get('/index');
+      assert.equal(response.text, test_static_file1, 'Responds with correct static file');
+    });
+  });
 
-    assert(response.text === test_index_file, 'Responds with correct index file');
+  describe('Web Logger', () => {
+    it('logs error when express encounters an error', async function () {
+      sinon.stub(createRemixRouter, 'default').callsFake(async () => {
+        const remix_api = express.Router();
+        remix_api.get('/error', () => {
+          throw new Error('Some Error');
+        });
+        return { remix_api, db: undefined };
+      });
 
-    return new Promise((resolve) => {
-      server.close(() => {
-        resolve();
+      const server = await StartWebServer();
+
+      const req = request(TEST_URL);
+      await req.get('/error');
+
+      assert.equal(this.logger_stub.error.callCount, 1, 'Calls error logger once');
+      assert.throws(() => {
+        throw this.logger_stub.error.getCall(0).args[1];
+      }, 'Some Error');
+
+      return new Promise((resolve) => {
+        server.close(() => resolve());
       });
     });
   });
 
-  it('returns static content at /test_static0.js', async () => {
-    const server = StartWebServer(DB_LOCATION, WEB_STATIC_PATH, WEB_INDEX_PATH, WEB_PORT, false);
+  describe('Allow/Reject CORS', () => {
+    it('calls CORS middleware when in dev environment', async () => {
+      const spy = sinon.spy(cors, 'CORS');
 
-    const req = request(TEST_URL);
-    const response = await req.get('/test_static0.js');
+      stubConfig({
+        env_config: {
+          in_dev_env: true,
+        },
+      });
+      const server = await StartWebServer();
 
-    assert(response.text === test_static_file0, 'Responds with correct static file');
+      const req = request(TEST_URL);
+      await req.get('/index');
 
-    return new Promise((resolve) => {
-      server.close(() => {
-        resolve();
+      assert.equal(spy.callCount, 1, 'Calls CORS Middleware');
+
+      return new Promise((resolve) => {
+        server.close(() => resolve());
       });
     });
-  });
 
-  it('returns static content in a subfolder at /subfolder/test_static1.js', async () => {
-    const server = StartWebServer(DB_LOCATION, WEB_STATIC_PATH, WEB_INDEX_PATH, WEB_PORT, false);
-    const req = request(TEST_URL);
-    const response = await req.get('/subfolder/test_static1.js');
+    it('does not call CORS middleware when in non dev environment', async () => {
+      const spy = sinon.spy(cors, 'CORS');
 
-    assert(response.text === test_static_file1, 'Responds with correct static file');
+      stubConfig({
+        env_config: {
+          in_dev_env: false,
+        },
+      });
+      const server = await StartWebServer();
 
-    return new Promise((resolve) => {
-      server.close(() => {
-        resolve();
+      const req = request(TEST_URL);
+      await req.get('/index');
+
+      assert.equal(spy.callCount, 0, 'Does not call CORS Middleware');
+
+      return new Promise((resolve) => {
+        server.close(() => resolve());
       });
     });
-  });
-});
-
-describe('Web Logger', () => {
-  it('logs error when express encounters an error', async () => {
-    sinon.stub(createRemixRouter, 'default').callsFake(() => {
-      const router = express.Router();
-      router.get('/error', () => {
-        throw new Error('Some Error');
-      });
-      return router;
-    });
-
-    const spy = sinon.spy();
-    sinon.stub(Logger, 'default').callsFake(() => {
-      return {
-        error: spy,
-        debug: () => {
-          return;
-        },
-        info: () => {
-          return;
-        },
-        warn: () => {
-          return;
-        },
-        fatal: () => {
-          return;
-        },
-      };
-    });
-
-    const server = StartWebServer(DB_LOCATION, WEB_STATIC_PATH, WEB_INDEX_PATH, WEB_PORT, false);
-
-    const req = request(TEST_URL);
-    await req.get('/error');
-
-    assert.equal(spy.callCount, 1, 'Calls error logger once');
-    assert.throws(() => {
-      throw spy.getCall(0).args[1];
-    }, 'Some Error');
-
-    server.close();
-  });
-});
-
-describe('Allow CORS', () => {
-  it('calls CORS middleware', async () => {
-    const spy = sinon.spy();
-    sinon.stub(Logger, 'default').callsFake(() => {
-      return {
-        error: () => {
-          return;
-        },
-        debug: () => {
-          return;
-        },
-        info: spy,
-        warn: () => {
-          return;
-        },
-        fatal: () => {
-          return;
-        },
-        profile: () => {
-          return {
-            stop: () => {
-              return;
-            },
-          };
-        },
-      };
-    });
-
-    const server = StartWebServer(DB_LOCATION, WEB_STATIC_PATH, WEB_INDEX_PATH, WEB_PORT, true);
-
-    assert(spy.calledWith('Enabling Cross-Origin Resource Sharing (CORS)'), 'CORS middleware is used');
-
-    server.close();
   });
 });

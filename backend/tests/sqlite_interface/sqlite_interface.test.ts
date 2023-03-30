@@ -11,7 +11,7 @@ import uniqueID from '../test_utils/unique_id.test';
 
 import { matchTestRow, SQLiteInterfaceTester } from './sqlite_interface_test_utils.test';
 
-const TEST_DB_DIRECTORY = path.join(__dirname, 'test_track_db_interface');
+const TEST_DB_DIRECTORY = path.join(__dirname, 'test_sqlite_interface');
 
 describe('SQLite Interface', () => {
   before(() => {

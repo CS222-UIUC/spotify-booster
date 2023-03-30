@@ -14,7 +14,7 @@ export default function createWebLogger(log: Logger) {
     const from_ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
     log.error(`Error handling request from ${from_ip} for ${path}`, error);
-    next(error);
+    next();
   }
 
   // logs debug messages for what pages are requested

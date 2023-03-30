@@ -15,21 +15,11 @@ let stubbed_loggers: Array<{
 export function createLoggerStub(): LoggerImport.default {
   const logger = {
     spies: [] as Array<sinon.SinonSpiedInstance<{ name: string; stop: () => void }>>,
-    debug: () => {
-      return;
-    },
-    info: () => {
-      return;
-    },
-    warn: () => {
-      return;
-    },
-    error: () => {
-      return;
-    },
-    fatal: () => {
-      return;
-    },
+    debug: sinon.spy(),
+    info: sinon.spy(),
+    warn: sinon.spy(),
+    error: sinon.spy(),
+    fatal: sinon.spy(),
     profile: function (name: string) {
       const profiler = {
         name,
@@ -53,12 +43,13 @@ export function createLoggerStub(): LoggerImport.default {
  * stubLogger() - Replaces imported logger with a dummy logger for tests and clears saved stubbed_loggers
  * IMPORTANT: Should be called in beforeEach hooks for tests that need a dummy logger
  */
-export function stubLogger() {
+export function stubLogger(): LoggerImport.default {
   stubbed_loggers = [];
   const logger = createLoggerStub();
   sinon.stub(LoggerImport, 'default').callsFake((name) => {
     return logger;
   });
+  return logger;
 }
 
 /**

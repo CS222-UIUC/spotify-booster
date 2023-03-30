@@ -5,7 +5,14 @@ dotenv.config({ path: path.join(__dirname, '..', '..', '..', '.env') });
 // Pulls config from .env file and exports them in seperate objects
 // Makes stubbing configs for testing easier
 
-export const IN_DEV_ENV: boolean = process.env.NODE_ENV === 'Development';
+const IN_DEV_DEV = process.env.APP_ENV === 'Development';
+
+export type EnvironmentConfig = {
+  in_dev_env: boolean;
+};
+export const env_config = Object.freeze({
+  in_dev_env: IN_DEV_DEV,
+});
 
 // Backend Logger Configuration
 const LOG_FILE = process.env.LOG_FILE === 'true';

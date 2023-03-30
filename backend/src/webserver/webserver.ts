@@ -1,24 +1,24 @@
 import express from 'express';
 import http from 'http';
 import path from 'path';
-import cors from 'cors';
 
+import { env_config, web_server_config } from '../config/config';
 import Logger from '../logger/logger';
 import createWebLogger from './web_logger';
 import createRemixRouter from '../remix_api/remix_api';
+import { CORS } from './cors_import';
 
 /**
  * createHTTPSever() - Creates a http/https webserver using the environment configuration
  * @param log - logger
- * @param port - port to listen on
  * @returns - webserver
  */
-function createHTTPServer(log: Logger, port: number) {
+function createHTTPServer(log: Logger) {
   const http_server = http.createServer();
 
-  http_server.listen(port);
+  http_server.listen(web_server_config.port);
   http_server.on('listening', () => {
-    log.info(`Webserver listening on port: ${port}`);
+    log.info(`Webserver listening on port: ${web_server_config.port}`);
   });
   return http_server;
 }
@@ -27,60 +27,44 @@ function createHTTPServer(log: Logger, port: number) {
  * createExpressApp() - Creates an express web app and loads routers and extensions
  * @param webserver - http/https webserver express should listen on
  * @param log - logger
- * @param db_location - location of remix database
- * @param static_path - location of static web files
- * @param index_path - location of index.html file
  * @returns express webserver
  */
-function createExpressApp(
-  webserver: http.Server,
-  log: Logger,
-  db_location: string,
-  static_path: string,
-  index_path: string,
-  allow_cors: boolean
-) {
-  const remix_api = createRemixRouter(log, db_location);
+async function createExpressApp(webserver: http.Server, log: Logger) {
+  const { db, remix_api } = await createRemixRouter(log);
   const { webLogError, webLogger } = createWebLogger(log);
 
   const app = express();
-  if (allow_cors) {
+  if (env_config.in_dev_env) {
     log.info('Enabling Cross-Origin Resource Sharing (CORS)');
-    app.use(cors());
+    app.use(CORS);
   }
 
-  app.use(express.static(static_path)); // setup static directory for webapp
+  app.use(express.static(web_server_config.static_path)); // setup static directory for webapp
   app.use(webLogger);
   app.use(remix_api);
 
   // serve homepage
   app.get('/index', (res, req) => {
-    req.sendFile(path.resolve(index_path));
+    req.sendFile(path.resolve(web_server_config.index_path));
   });
 
   app.use(webLogError); // must go at the end to make sure errors are handled
 
   webserver.on('request', app);
 
+  webserver.on('close', async () => {
+    log.info('Closing webserver and database');
+    await db.close();
+  });
   return webserver;
 }
 
 /**
  * StartWebServer() - Starts the webserver
- * @param db_location - location of remix database
- * @param static_path - location of static web files
- * @param index_path - location of index.html file
- * @param port - port to listen on
  * @returns express webserver
  */
-export default function StartWebServer(
-  db_location: string,
-  static_path: string,
-  index_path: string,
-  port: number,
-  allow_cors: boolean
-) {
+export default function StartWebServer() {
   const logger = new Logger('Webserver');
-  const webserver = createHTTPServer(logger, port);
-  return createExpressApp(webserver, logger, db_location, static_path, index_path, allow_cors);
+  const webserver = createHTTPServer(logger);
+  return createExpressApp(webserver, logger);
 }

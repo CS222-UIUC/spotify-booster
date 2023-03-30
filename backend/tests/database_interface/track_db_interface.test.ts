@@ -8,7 +8,7 @@ import { stubLogger } from '../test_utils/stubs/stub_logger.test';
 import uniqueID from '../test_utils/unique_id.test';
 import { checkTrackDB } from './database_interface_utils.test';
 
-const TEST_DB_DIRECTORY = path.join(__dirname, 'test_remix_db_interface');
+const TEST_DB_DIRECTORY = path.join(__dirname, 'test_track_db_interface');
 
 describe('Track DB Interface', () => {
   before(() => {

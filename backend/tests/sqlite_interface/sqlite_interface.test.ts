@@ -2,219 +2,180 @@ import { assert } from 'chai';
 import sinon from 'sinon';
 import path from 'path';
 import fs from 'fs-extra';
-
-import { SQLiteInterfaceTester } from './sqlite_interface_test_utils.test';
 import sqlite3 from 'sqlite3';
+
+import arraysMatchUnordered from '../test_utils/assertions/arrays_match_unordered.test';
+import { createDirectory, removeDirectory } from '../test_utils/hooks/create_test_directory.test';
+import { createLoggerStub, stubLogger } from '../test_utils/stubs/stub_logger.test';
+import uniqueID from '../test_utils/unique_id.test';
+
+import { matchTestRow, SQLiteInterfaceTester } from './sqlite_interface_test_utils.test';
 import Logger from '../../src/logger/logger';
 
-const TEMP_FILE_DIRECTORY = path.join(__dirname, 'test_databases');
-
-// ensure empty temporary directory exists before running tests
-before(async () => {
-  try {
-    fs.mkdirSync(TEMP_FILE_DIRECTORY, { recursive: true });
-    fs.emptyDirSync(TEMP_FILE_DIRECTORY);
-  } catch {
-    /* */
-  }
-});
-
-afterEach(() => {
-  sinon.restore();
-});
-
-// delete temporary directory after running tests
-after(async () => {
-  try {
-    fs.rmSync(TEMP_FILE_DIRECTORY, { recursive: true, force: true });
-  } catch {
-    /* */
-  }
-});
-
-// Returns a unique string each time to be used as a database name
-function unique_database_name() {
-  return `Database-Test-${Date.now()}.db`;
-}
-
-/**
- * arraysMatchUnordered() - Checks if 2 arrays match without regard to order
- * @param a - first list
- * @param b - second list
- * @param comparator - function to compare elements, defaults to ===
- * @returns - If arrays match without regard to order
- */
-export default function arraysMatchUnordered<T>(a: Array<T>, b: Array<T>, comparator?: (a: T, b: T) => boolean): boolean {
-  if (!comparator) {
-    comparator = (a, b) => {
-      return a === b;
-    };
-  }
-  if (a.length !== b.length) return false;
-  for (let i = 0; i < a.length; i++) {
-    let found = false;
-    for (let j = 0; j < b.length && !found; j++) {
-      if (comparator(a[i], b[j])) {
-        found = true;
-        break;
-      }
-    }
-    if (!found) return false;
-  }
-  return true;
-}
+const TEST_DB_DIRECTORY = path.join(__dirname, 'test_track_db_interface');
 
 describe('SQLite Interface', () => {
-  it('opens existing database', async () => {
-    const tables = [
-      {
-        name: 'test_table',
-        cols: '(col1 STRING, col2 INT)',
-      },
-    ];
-    const db_location = path.join(__dirname, '..', '..', '..', 'tests', 'sqlite_interface', 'sqlite_interface.test.db');
-    const sqlite_interface = new SQLiteInterfaceTester(db_location, tables, new Logger('Test SQLiteInterface'));
-
-    const rows = await sqlite_interface.dbAll('SELECT * FROM test_table', {});
-
-    const expected_rows = [
-      { col1: 'some string', col2: 0 },
-      { col1: 'another string', col2: 1 },
-      { col1: 'a string', col2: 2 },
-    ];
-    assert(
-      arraysMatchUnordered<(typeof expected_rows)[0]>(expected_rows, rows, (a, b) => a.col1 === b.col1 && a.col2 === b.col2),
-      'Reads existing database correctly'
-    );
-
-    await sqlite_interface.close();
+  before(() => {
+    createDirectory(TEST_DB_DIRECTORY);
   });
 
-  it('creates new database if no database exists and writes to it', async () => {
-    const tables = [
-      {
-        name: 'test_table0',
-        cols: '(col1 STRING, col2 INT)',
-      },
-      {
-        name: 'test_table1',
-        cols: '(col3 STRING, col4 INT)',
-      },
-    ];
-    const db_location = path.join(TEMP_FILE_DIRECTORY, unique_database_name());
-    const sqlite_interface = new SQLiteInterfaceTester(db_location, tables, new Logger('Test SQLiteInterface'));
-
-    await sqlite_interface.dbRun('INSERT INTO test_table0 VALUES ($col1, $col2)', {
-      $col1: 'some string',
-      $col2: '0',
-    });
-
-    const rows = await sqlite_interface.dbAll('SELECT * FROM test_table0', {});
-    const expected_rows = [{ col1: 'some string', col2: 0 }];
-    assert(
-      arraysMatchUnordered(expected_rows, rows, (a, b) => a.col1 === b.col1 && a.col2 === b.col2),
-      'Writes to new database correctly'
-    );
-
-    assert(fs.existsSync(db_location), 'Creates database at correct location');
-
-    await sqlite_interface.close();
+  beforeEach(() => {
+    stubLogger();
   });
 
-  it('rejects ready if it fails to open database', async () => {
-    sinon.stub(sqlite3, 'Database').yields(new Error('Failed to Open Database'));
-
-    const db_location = path.join(__dirname, '..', '..', '..', 'tests', 'sqlite_interface', 'sqlite_interface.test.db');
-    const sqlite_interface = new SQLiteInterfaceTester(db_location, [], new Logger('Test SQLiteInterface'));
-
-    await assert.isRejected(sqlite_interface.ready, 'Failed to Open Database');
+  after(() => {
+    removeDirectory(TEST_DB_DIRECTORY);
   });
 
-  it('rejects ready if it fails to create tables', async () => {
-    sinon.stub(sqlite3, 'Database').callsFake((db_path, cb) => {
-      setImmediate(() => {
-        cb();
+  describe('New Database Initialization', () => {
+    it('creates new database if no database exists and writes to it', async () => {
+      const tables = [
+        {
+          name: 'test_table0',
+          cols: '(col1 STRING, col2 INT)',
+        },
+        {
+          name: 'test_table1',
+          cols: '(col3 STRING, col4 INT)',
+        },
+      ];
+      const db_location = path.join(TEST_DB_DIRECTORY, uniqueID());
+      const sqlite_interface = new SQLiteInterfaceTester(db_location, tables, new Logger('Test SQLiteInterface'));
+
+      await sqlite_interface.dbRun('INSERT INTO test_table0 VALUES ($col1, $col2)', {
+        $col1: 'some string',
+        $col2: '0',
       });
-      return {
-        run: sinon.fake.yields(new Error('Failed to Run Command')),
-      };
+
+      const rows = await sqlite_interface.dbAll('SELECT * FROM test_table0', {});
+      const expected_rows = [{ col1: 'some string', col2: 0 }];
+      arraysMatchUnordered(expected_rows, rows, matchTestRow, 'Existing Data');
+
+      assert(fs.existsSync(db_location), 'Creates database at correct location');
+
+      await sqlite_interface.close();
+    });
+  });
+
+  describe('Existing Database Initialization', () => {
+    it('opens existing database and reads existing data', async () => {
+      const tables = [
+        {
+          name: 'test_table',
+          cols: '(col1 STRING, col2 INT)',
+        },
+      ];
+      const db_location = path.join(__dirname, '..', '..', '..', 'tests', 'sqlite_interface', 'sqlite_interface.test.db');
+      const sqlite_interface = new SQLiteInterfaceTester(db_location, tables, new Logger('Test SQLiteInterface'));
+
+      const rows = await sqlite_interface.dbAll('SELECT * FROM test_table', {});
+      const expected_rows = [
+        { col1: 'some string', col2: 0 },
+        { col1: 'another string', col2: 1 },
+        { col1: 'a string', col2: 2 },
+      ];
+      arraysMatchUnordered(expected_rows, rows, matchTestRow, 'Existing Data');
+
+      await sqlite_interface.close();
+    });
+  });
+
+  describe('Failed Database Initalization', () => {
+    it('rejects ready if it fails to open database', async () => {
+      sinon.stub(sqlite3, 'Database').yields(new Error('Failed to Open Database'));
+
+      const db_location = path.join(__dirname, '..', '..', '..', 'tests', 'sqlite_interface', 'sqlite_interface.test.db');
+      const sqlite_interface = new SQLiteInterfaceTester(db_location, [], createLoggerStub());
+
+      await assert.isRejected(sqlite_interface.ready, 'Failed to Open Database');
     });
 
-    const tables = [
-      {
-        name: 'test_table0',
-        cols: '(col1 STRING, col2 INT)',
-      },
-      {
-        name: 'test_table1',
-        cols: '(col3 STRING, col4 INT)',
-      },
-    ];
-    const db_location = path.join(TEMP_FILE_DIRECTORY, unique_database_name());
-    const sqlite_interface = new SQLiteInterfaceTester(db_location, tables, new Logger('Test SQLiteInterface'));
-
-    await assert.isRejected(sqlite_interface.ready, 'Failed to Run Command');
-  });
-
-  it('rejected ready if error occurs while checking database exists already or not', async () => {
-    sinon.stub(fs, 'existsSync').callsFake(sinon.fake.throws('Failed to Check Exists'));
-
-    const db_location = path.join(TEMP_FILE_DIRECTORY, unique_database_name());
-    const sqlite_interface = new SQLiteInterfaceTester(db_location, [], new Logger('Test SQLiteInterface'));
-
-    await assert.isRejected(sqlite_interface.ready, 'Failed to Check Exists');
-  });
-
-  it('rejects dbRun if sqlite3 returns error', async () => {
-    sinon.stub(sqlite3, 'Database').callsFake((db_path, cb) => {
-      setImmediate(() => {
-        cb();
+    it('rejects ready if it fails to create tables', async () => {
+      sinon.stub(sqlite3, 'Database').callsFake((db_path, cb) => {
+        setImmediate(() => cb());
+        return {
+          run: sinon.fake.yields(new Error('Failed to Run Command')),
+        };
       });
-      return {
-        serialize: sinon.fake.yields(),
-        run: sinon.fake.yields(new Error('Failed to Run Command')),
-      };
-    });
-    const db_location = path.join(TEMP_FILE_DIRECTORY, unique_database_name());
-    const sqlite_interface = new SQLiteInterfaceTester(db_location, [], new Logger('Test SQLiteInterface'));
 
-    await assert.isRejected(
-      sqlite_interface.dbRun('CREATE TABLE test_table (col1 STRING, col2 INT)', {}),
-      'Failed to Run Command'
-    );
+      const tables = [
+        {
+          name: 'test_table0',
+          cols: '(col1 STRING, col2 INT)',
+        },
+        {
+          name: 'test_table1',
+          cols: '(col3 STRING, col4 INT)',
+        },
+      ];
+      const db_location = path.join(TEST_DB_DIRECTORY, uniqueID());
+      const sqlite_interface = new SQLiteInterfaceTester(db_location, tables, createLoggerStub());
+
+      await assert.isRejected(sqlite_interface.ready, 'Failed to Run Command');
+    });
+
+    it('rejected ready if error occurs while checking database exists already or not', async () => {
+      sinon.stub(fs, 'existsSync').callsFake(sinon.fake.throws('Failed to Check Exists'));
+
+      const db_location = path.join(TEST_DB_DIRECTORY, uniqueID());
+      const sqlite_interface = new SQLiteInterfaceTester(db_location, [], createLoggerStub());
+
+      await assert.isRejected(sqlite_interface.ready, 'Failed to Check Exists');
+    });
   });
 
-  it('rejects dbAll if sqlite3 returns error', async () => {
-    sinon.stub(sqlite3, 'Database').callsFake((db_path, cb) => {
-      setImmediate(() => {
-        cb();
+  describe('sqlite3 error handling', () => {
+    it('rejects dbRun if sqlite3 returns error', async () => {
+      sinon.stub(sqlite3, 'Database').callsFake((db_path, cb) => {
+        setImmediate(() => {
+          cb();
+        });
+        return {
+          serialize: sinon.fake.yields(),
+          run: sinon.fake.yields(new Error('Failed to Run Command')),
+        };
       });
-      return {
-        serialize: sinon.fake.yields(),
-        all: sinon.fake.yields(new Error('Failed to Fetch All')),
-      };
+      const db_location = path.join(TEST_DB_DIRECTORY, uniqueID());
+      const sqlite_interface = new SQLiteInterfaceTester(db_location, [], createLoggerStub());
+
+      await assert.isRejected(
+        sqlite_interface.dbRun('CREATE TABLE test_table (col1 STRING, col2 INT)', {}),
+        'Failed to Run Command'
+      );
     });
-    const db_location = path.join(TEMP_FILE_DIRECTORY, unique_database_name());
-    const sqlite_interface = new SQLiteInterfaceTester(db_location, [], new Logger('Test SQLiteInterface'));
 
-    await assert.isRejected(
-      sqlite_interface.dbAll('SELECT count(*) FROM sqlite_master WHERE type = "table"', {}),
-      'Failed to Fetch All'
-    );
-  });
-
-  it('rejects close if sqlite3 returns error', async () => {
-    sinon.stub(sqlite3, 'Database').callsFake((db_path, cb) => {
-      setImmediate(() => {
-        cb();
+    it('rejects dbAll if sqlite3 returns error', async () => {
+      sinon.stub(sqlite3, 'Database').callsFake((db_path, cb) => {
+        setImmediate(() => {
+          cb();
+        });
+        return {
+          serialize: sinon.fake.yields(),
+          all: sinon.fake.yields(new Error('Failed to Fetch All')),
+        };
       });
-      return {
-        close: sinon.fake.yields(new Error('Failed to Close')),
-      };
-    });
-    const db_location = path.join(TEMP_FILE_DIRECTORY, unique_database_name());
-    const sqlite_interface = new SQLiteInterfaceTester(db_location, [], new Logger('Test SQLiteInterface'));
+      const db_location = path.join(TEST_DB_DIRECTORY, uniqueID());
+      const sqlite_interface = new SQLiteInterfaceTester(db_location, [], createLoggerStub());
 
-    await assert.isRejected(sqlite_interface.close(), 'Failed to Close');
+      await assert.isRejected(
+        sqlite_interface.dbAll('SELECT count(*) FROM sqlite_master WHERE type = "table"', {}),
+        'Failed to Fetch All'
+      );
+    });
+
+    it('rejects close if sqlite3 returns error', async () => {
+      sinon.stub(sqlite3, 'Database').callsFake((db_path, cb) => {
+        setImmediate(() => {
+          cb();
+        });
+        return {
+          close: sinon.fake.yields(new Error('Failed to Close')),
+        };
+      });
+      const db_location = path.join(TEST_DB_DIRECTORY, uniqueID());
+      const sqlite_interface = new SQLiteInterfaceTester(db_location, [], createLoggerStub());
+
+      await assert.isRejected(sqlite_interface.close(), 'Failed to Close');
+    });
   });
 });

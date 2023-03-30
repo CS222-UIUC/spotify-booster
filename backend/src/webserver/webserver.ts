@@ -44,7 +44,12 @@ async function createExpressApp(webserver: http.Server, log: Logger) {
   app.use(remix_api);
 
   // serve homepage
-  app.get('/index', (res, req) => {
+  app.get('/', (res, req) => {
+    req.sendFile(path.resolve(web_server_config.index_path));
+  });
+
+  // send app on callback too
+  app.get('/callback', (res, req) => {
     req.sendFile(path.resolve(web_server_config.index_path));
   });
 

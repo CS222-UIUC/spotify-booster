@@ -61,9 +61,16 @@ describe('Web Server', () => {
       this.server.close(() => done());
     });
 
-    it('returns index page at /index', async () => {
+    it('returns index page at /', async () => {
       const req = request(TEST_URL);
-      const response = await req.get('/index');
+      const response = await req.get('/');
+
+      assert.equal(response.text, test_index_file, 'Responds with correct index file');
+    });
+
+    it('returns index page at /callback', async () => {
+      const req = request(TEST_URL);
+      const response = await req.get('/callback');
 
       assert.equal(response.text, test_index_file, 'Responds with correct index file');
     });

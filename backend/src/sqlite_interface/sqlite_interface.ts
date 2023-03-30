@@ -34,7 +34,7 @@ export default class SQLiteInterface {
    */
   protected async dbRun(cmd: string, params: object): Promise<RunResult> {
     await this.ready_;
-    const profiler = this.log_.profile(`Run {cmd: ${cmd}}`);
+    const profiler = this.log_.profile(`Run {cmd: ${cmd}}`, { warn: 1000, error: 5000 });
     try {
       const result: RunResult = await new Promise((resolve, reject) => {
         this.db_.serialize(() => {
@@ -45,14 +45,10 @@ export default class SQLiteInterface {
         });
       });
 
-      profiler.stop({ level_thresholds: { warn: 1000, error: 5000 } });
+      profiler.stop();
       return result;
     } catch (error) {
-      profiler.stop({
-        success: false,
-        level: 'warn',
-        level_thresholds: { warn: 1000, error: 5000 },
-      });
+      profiler.stop({ success: false, level: 'warn' });
       this.log_.warn(`Error while running SQL {cmd: ${cmd}} with {param:${JSON.stringify(params)}}`, error);
       throw error;
     }
@@ -67,7 +63,7 @@ export default class SQLiteInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected async dbAll(cmd: string, params: object): Promise<Array<any>> {
     await this.ready_;
-    const profiler = this.log_.profile(`Fetch all rows {cmd: ${cmd}}`);
+    const profiler = this.log_.profile(`Fetch all rows {cmd: ${cmd}}`, { warn: 1000, error: 5000 });
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const rows: Array<any> = await new Promise((resolve, reject) => {
@@ -79,14 +75,10 @@ export default class SQLiteInterface {
         });
       });
 
-      profiler.stop({ level_thresholds: { warn: 1000, error: 5000 } });
+      profiler.stop();
       return rows;
     } catch (error) {
-      profiler.stop({
-        success: false,
-        level: 'warn',
-        level_thresholds: { warn: 1000, error: 5000 },
-      });
+      profiler.stop({ success: false, level: 'warn' });
       this.log_.warn(`Error while fetching rows with SQL {cmd: ${cmd}} with {param:${JSON.stringify(params)}}`, error);
       throw error;
     }
@@ -139,15 +131,11 @@ export default class SQLiteInterface {
 
     this.ready_ = new Promise((res, rej) => {
       const resolve = () => {
-        profile.stop({ level_thresholds: { info: 0, error: 5000 } });
+        profile.stop();
         res();
       };
       const reject = (error: Error) => {
-        profile.stop({
-          success: false,
-          level: 'error',
-          level_thresholds: { info: 0, error: 5000 },
-        });
+        profile.stop({ success: false, level: 'error' });
         rej(error);
       };
 

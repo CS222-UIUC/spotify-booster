@@ -159,8 +159,14 @@ describe('Track DB Interface', () => {
     });
 
     it('rejects invalid start and end data', async function () {
-      await assert.isRejected(this.db.setStartMS(this.id0, this.default_remix0[0].track_id, -1), 'start_ms cannot be negative');
-      await assert.isRejected(this.db.setEndMS(this.id0, this.default_remix0[0].track_id, -2), 'end_ms cannot be less than -1');
+      await assert.isRejected(
+        this.db.setStartMS(this.id0, this.default_remix0[0].track_id, -1),
+        'start_ms cannot be negative'
+      );
+      await assert.isRejected(
+        this.db.setEndMS(this.id0, this.default_remix0[0].track_id, -2),
+        'end_ms cannot be less than -1'
+      );
 
       await checkTrackDB(this.db, this.id0, this.id1, this.default_remix0, this.default_remix1, 8);
     });

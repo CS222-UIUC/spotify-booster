@@ -19,7 +19,7 @@
             "error",
             {
                 "endOfLine": "auto",
-                "printWidth": 130
+                "printWidth": 125
             }
         ],
         "node/no-unpublished-import": [

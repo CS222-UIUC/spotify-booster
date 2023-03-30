@@ -43,7 +43,15 @@ describe('Database Interface', () => {
 
   describe('Existing Database Initialization', () => {
     it('opens an existing database and finds existing tracks and remixes', async () => {
-      const db_location = path.join(__dirname, '..', '..', '..', 'tests', 'database_interface', 'database_interface.test.db');
+      const db_location = path.join(
+        __dirname,
+        '..',
+        '..',
+        '..',
+        'tests',
+        'database_interface',
+        'database_interface.test.db'
+      );
       const db = new DatabaseInterface(db_location);
 
       const id0 = 'WeWkXbxl7OQXyqAImuOdHBnI+lgKbvr+jI1t0JJ5xTo=';

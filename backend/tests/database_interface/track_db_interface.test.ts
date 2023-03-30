@@ -1,6 +1,4 @@
-import chai, { assert } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-chai.use(chaiAsPromised);
+import { assert } from 'chai';
 import fs from 'fs-extra';
 import path from 'path';
 import crypto from 'crypto';

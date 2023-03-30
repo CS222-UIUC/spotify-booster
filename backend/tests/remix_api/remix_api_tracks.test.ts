@@ -5,9 +5,10 @@ import express, { Response, NextFunction } from 'express';
 import sinon from 'sinon';
 
 import createRemixRouter from '../../src/remix_api/remix_api';
-import { arrays_match_unordered } from '../database_interface/track_db_interface.test';
 import Logger from '../../src/logger/logger';
 import * as spotifyAuth from '../../src/spotify_authentication/spotify_authentication';
+import arraysMatchUnordered from '../test_utils/assertions/arrays_match_unordered.test';
+import { matchTracks } from '../database_interface/database_interface_utils.test';
 
 const DB_LOCATION = path.join(__dirname, 'test.db');
 
@@ -59,7 +60,7 @@ describe('Remix API Add Track', () => {
     const response2 = await request(app).get(`/remixapi/getRemixTracks?remix_id=${remix_id}`);
 
     assert(response2.statusCode === 200, 'Responds with success status code');
-    assert(arrays_match_unordered(response2.body.tracks, tracks), 'Tracks were added correctly');
+    arraysMatchUnordered(response2.body.tracks, tracks, matchTracks, 'Remix Tracks');
   });
 
   it('refuses to add track with invalid remix_id', async () => {
@@ -106,7 +107,7 @@ describe('Remix API Delete Track', () => {
     assert(response2.statusCode === 200, 'Responds with success status code');
 
     const response3 = await request(app).get(`/remixapi/getRemixTracks?remix_id=${remix_id}`);
-    assert(arrays_match_unordered(response3.body.tracks, tracks), 'Tracks were deleted correctly');
+    arraysMatchUnordered(response3.body.tracks, tracks, matchTracks, 'Remix Tracks');
   });
 
   it('refuses to add track with invalid remix_id', async () => {
@@ -127,7 +128,7 @@ describe('Remix API Delete Track', () => {
     assert(response2.body.error_message === 'Invalid Remix Id', 'Responds with error message');
 
     const response3 = await request(app).get(`/remixapi/getRemixTracks?remix_id=${remix_id}`);
-    assert(arrays_match_unordered(response3.body.tracks, tracks), 'Tracks were not deleted');
+    arraysMatchUnordered(response3.body.tracks, tracks, matchTracks, 'Remix Tracks');
   });
 
   it('refuses to delete track with invalid track_id', async () => {
@@ -148,7 +149,7 @@ describe('Remix API Delete Track', () => {
     assert(response2.body.error_message === 'Invalid Track Id', 'Responds with error message');
 
     const response3 = await request(app).get(`/remixapi/getRemixTracks?remix_id=${remix_id}`);
-    assert(arrays_match_unordered(response3.body.tracks, tracks), 'Tracks were not deleted');
+    arraysMatchUnordered(response3.body.tracks, tracks, matchTracks, 'Remix Tracks');
   });
 });
 
@@ -202,7 +203,7 @@ describe('Remix API Set Start/End Data', () => {
     }
 
     const response2 = await request(app).get(`/remixapi/getRemixTracks?remix_id=${remix_id}`);
-    assert(arrays_match_unordered(response2.body.tracks, tracks), 'Tracks were updated correctly');
+    arraysMatchUnordered(response2.body.tracks, tracks, matchTracks, 'Remix Tracks');
   });
 
   it('refuses to set invalid start data', async () => {
@@ -219,9 +220,7 @@ describe('Remix API Set Start/End Data', () => {
     const invalid_remix_id = 'invalid';
     const invalid_track_id = 'invalid;';
     const track_id = tracks[0].track_id;
-    const response0 = await request(app).put(
-      `/remixapi/setStartMs?remix_id=${remix_id}&track_id=${track_id}&start_ms=${-1}`
-    );
+    const response0 = await request(app).put(`/remixapi/setStartMs?remix_id=${remix_id}&track_id=${track_id}&start_ms=${-1}`);
     const response1 = await request(app).put(
       `/remixapi/setStartMs?remix_id=${remix_id}&track_id=${invalid_track_id}&start_ms=${0}`
     );
@@ -256,15 +255,9 @@ describe('Remix API Set Start/End Data', () => {
     const invalid_track_id = 'invalid;';
     const track_id = tracks[0].track_id;
     const response0 = await request(app).put(`/remixapi/setEndMs?remix_id=${remix_id}&track_id=${track_id}&end_ms=${-2}`);
-    const response1 = await request(app).put(
-      `/remixapi/setEndMs?remix_id=${remix_id}&track_id=${invalid_track_id}&end_ms=${-1}`
-    );
-    const response2 = await request(app).put(
-      `/remixapi/setEndMs?remix_id=${invalid_remix_id}&track_id=${track_id}&end_ms=${-1}`
-    );
-    const response3 = await request(app).put(
-      `/remixapi/setEndMs?remix_id=${invalid_remix_id}&track_id=${track_id}&end_ms=asdf`
-    );
+    const response1 = await request(app).put(`/remixapi/setEndMs?remix_id=${remix_id}&track_id=${invalid_track_id}&end_ms=${-1}`);
+    const response2 = await request(app).put(`/remixapi/setEndMs?remix_id=${invalid_remix_id}&track_id=${track_id}&end_ms=${-1}`);
+    const response3 = await request(app).put(`/remixapi/setEndMs?remix_id=${invalid_remix_id}&track_id=${track_id}&end_ms=asdf`);
 
     assert(response0.statusCode === 400, 'Responds with bad request code');
     assert(response0.body.error_message === 'end_ms cannot be less than -1', 'Responds with error message');

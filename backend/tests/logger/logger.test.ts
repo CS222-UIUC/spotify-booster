@@ -75,9 +75,7 @@ function fetch_log(logger_name: string): {
     .readFileSync(path.join(LOG_FILE_DIRECTORY, `${logger_name}-Debug-${date_string}.log`), 'utf-8')
     .split('\r');
 
-  const info_logs = fs
-    .readFileSync(path.join(LOG_FILE_DIRECTORY, `${logger_name}-Info-${date_string}.log`), 'utf-8')
-    .split('\r');
+  const info_logs = fs.readFileSync(path.join(LOG_FILE_DIRECTORY, `${logger_name}-Info-${date_string}.log`), 'utf-8').split('\r');
 
   const debug: Array<{
     level: string;

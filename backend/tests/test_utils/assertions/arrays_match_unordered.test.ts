@@ -14,8 +14,9 @@ export default function arraysMatchUnordered<T>(
   array_identifier?: string
 ) {
   if (!comparator) comparator = (a, b) => a === b;
+  if (array_identifier) array_identifier = ` ${array_identifier} `;
 
-  assert.equal(actual.length, expected.length, `${array_identifier} arrays have same length`);
+  assert.equal(actual.length, expected.length, `Expcted${array_identifier}arrays to have same length`);
 
   for (let i = 0; i < expected.length; i++) {
     let found = false;
@@ -26,6 +27,6 @@ export default function arraysMatchUnordered<T>(
       }
     }
 
-    assert(found, `Expected ${i}-th element of ${array_identifier} array to be in actual array`);
+    assert(found, `Expected ${i}-th element of ${array_identifier}array to be in actual array`);
   }
 }

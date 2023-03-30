@@ -43,15 +43,7 @@ describe('Database Interface', () => {
 
   describe('Existing Database Initialization', () => {
     it('opens an existing database and finds existing tracks and remixes', async () => {
-      const db_location = path.join(
-        __dirname,
-        '..',
-        '..',
-        '..',
-        'tests',
-        'database_interface',
-        'database_interface.test.db'
-      );
+      const db_location = path.join(__dirname, '..', '..', '..', 'tests', 'database_interface', 'database_interface.test.db');
       const db = new DatabaseInterface(db_location);
 
       const id0 = 'WeWkXbxl7OQXyqAImuOdHBnI+lgKbvr+jI1t0JJ5xTo=';
@@ -84,9 +76,9 @@ describe('Database Interface', () => {
       assert.equal(await db.getRemixName(id0), name0, 'Remix 0 has correct name');
       assert.equal(await db.getRemixName(id1), name1, 'Remix 1 has correct name');
       assert.equal(await db.getRemixName(id2), name2, 'Remix 2 has correct name');
-      arraysMatchUnordered(await db.getRemixTracks(id0), remix0_tracks, matchTracks, 'Remix 0');
-      arraysMatchUnordered(await db.getRemixTracks(id1), remix1_tracks, matchTracks, 'Remix 1');
-      arraysMatchUnordered(await db.getRemixTracks(id2), remix2_tracks, matchTracks, 'Remix 2');
+      arraysMatchUnordered(await db.getRemixTracks(id0), remix0_tracks, matchTracks, 'Remix 0 Tracks');
+      arraysMatchUnordered(await db.getRemixTracks(id1), remix1_tracks, matchTracks, 'Remix 1 Tracks');
+      arraysMatchUnordered(await db.getRemixTracks(id2), remix2_tracks, matchTracks, 'Remix 2 Tracks');
 
       await db.close();
     });

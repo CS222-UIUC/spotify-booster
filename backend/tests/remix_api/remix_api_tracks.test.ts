@@ -4,7 +4,7 @@ import path from 'path';
 import express from 'express';
 
 import createRemixRouter from '../../src/remix_api/remix_api';
-import arraysMatchUnordered from '../test_utils/assertions/arrays_match_unordered.test';
+import { arraysMatchUnordered } from '../test_utils/assertions/arrays_match.test';
 import { matchTracks } from '../database_interface/database_interface_utils.test';
 import { createDirectory, removeDirectory } from '../test_utils/hooks/create_test_directory.test';
 import stubConfig from '../test_utils/stubs/stub_config.test';

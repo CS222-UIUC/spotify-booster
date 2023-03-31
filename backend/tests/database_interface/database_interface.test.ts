@@ -3,7 +3,7 @@ import fs from 'fs-extra';
 import path from 'path';
 
 import DatabaseInterface from '../../src/database_interface/database_interface';
-import arraysMatchUnordered from '../test_utils/assertions/arrays_match_unordered.test';
+import { arraysMatchUnordered } from '../test_utils/assertions/arrays_match.test';
 import { createDirectory, removeDirectory } from '../test_utils/hooks/create_test_directory.test';
 import { stubLogger } from '../test_utils/stubs/stub_logger.test';
 import uniqueID from '../test_utils/unique_id.test';

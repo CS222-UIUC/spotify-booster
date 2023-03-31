@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import DatabaseInterface from '../../src/database_interface/database_interface';
 import { TrackInfo } from '../../src/database_interface/track_db_interface';
-import arraysMatchUnordered from '../test_utils/assertions/arrays_match_unordered.test';
+import { arraysMatchUnordered } from '../test_utils/assertions/arrays_match.test';
 
 /**
  * matchTracks() - Compares two tracks and returns true if they match

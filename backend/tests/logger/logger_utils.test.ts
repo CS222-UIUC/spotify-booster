@@ -1,15 +1,14 @@
-import { assert } from 'chai';
 import fs from 'fs-extra';
 import path from 'path';
 
 export const LOG_FILE_DIRECTORY = path.join(__dirname, 'test_logs');
 
 /**
- * format_date() - Formats UNIX timestamp in YYYY-MM-DD format
+ * formatDate() - Formats UNIX timestamp in YYYY-MM-DD format
  * @param date - unix timestamp in ms
  * @returns - date string
  */
-export function format_date(date: number) {
+export function formatDate(date: number) {
   const d = new Date(date);
   let month = '' + (d.getMonth() + 1);
   let day = '' + d.getDate();
@@ -35,15 +34,14 @@ type ExpectedLogProperties = {
 };
 
 /**
- * fetch_log() - Fetches logs with given logger name
+ * fetchLogs() - Fetches logs with given logger name
  * @param logger_name - name passed to logger on creation
  */
-export function fetch_log(logger_name: string): { debug: Array<LogProperties>; info: Array<LogProperties> } {
-  const date_string = format_date(Date.now());
+export function fetchLogs(logger_name: string): { debug: Array<LogProperties>; info: Array<LogProperties> } {
+  const date_string = formatDate(Date.now());
   const debug_logs = fs
     .readFileSync(path.join(LOG_FILE_DIRECTORY, `${logger_name}-Debug-${date_string}.log`), 'utf-8')
     .split('\r');
-
   const info_logs = fs
     .readFileSync(path.join(LOG_FILE_DIRECTORY, `${logger_name}-Info-${date_string}.log`), 'utf-8')
     .split('\r');
@@ -67,51 +65,21 @@ export function fetch_log(logger_name: string): { debug: Array<LogProperties>; i
 }
 
 /**
- * compare_logs() - compares parsed log file with expected output
- * @param log_file - array of parsed log properties in the order to expect them to appear
- * @param expected - array of expected log properties in the order to expect them to appear
- * @param min_time - minimum timestamp
- * @param max_time - maximum timestamp
+ * matchLogs() - comparse 2 logs, returns true if they match
  */
-export function compare_logs(
-  log_file: Array<LogProperties>,
-  expected: Array<ExpectedLogProperties>,
-  min_time: number,
-  max_time: number
-) {
-  for (let i = 0; i < expected.length; i++) {
-    assert(log_file[i].level === expected[i].level, `Log levels match for: ${JSON.stringify(log_file[i])}`);
-
-    assert(log_file[i].message.startsWith(expected[i].message), `Log messages match for: ${JSON.stringify(log_file[i])}`);
-
-    assert(
-      new Date(log_file[i].timestamp).getTime() >= min_time,
-      `Log timestamp is not too early for: ${JSON.stringify(log_file[i])}`
-    );
-    assert(
-      new Date(log_file[i].timestamp).getTime() <= max_time,
-      `Log timestamp is not too late for: ${JSON.stringify(log_file[i])}`
-    );
-
-    if (expected[i].stack) {
-      assert(log_file[i].stack, `Log error message exists for: ${JSON.stringify(log_file[i])}`);
-
-      assert(
-        log_file[i].stack.startsWith('Error: ' + expected[i].stack),
-        `Log error message matches for: ${JSON.stringify(log_file[i])}`
-      );
-    }
-  }
-
-  assert(log_file.length === expected.length, 'Log file and expected had same length');
+export function matchLogs(a: LogProperties, e: LogProperties) {
+  const timestamp_match = a.timestamp === e.timestamp;
+  const message_match = a.message.startsWith(e.message);
+  const stack_match = e.stack ? a.stack.startsWith('Error: ' + e.stack) : true;
+  return a.level === e.level && timestamp_match && message_match && stack_match;
 }
 
 /**
- * filter_debug() - creates a new array of expected output without debug logs
+ * filterDebug() - creates a new array of expected output without debug logs
  * @param expected - array of log properties to remove debug messages from
  * @returns - array of log properties with debug messages removed
  */
-export function filter_debug(expected: Array<ExpectedLogProperties>): Array<ExpectedLogProperties> {
+export function filterDebug(expected: Array<ExpectedLogProperties>): Array<ExpectedLogProperties> {
   const new_array: Array<LogProperties> = [];
   for (let i = 0; i < expected.length; i++) {
     if (expected[i].level !== 'debug') {

@@ -136,7 +136,8 @@ export default function Control({
   // Handle when the current track changes.
   useEffect(() => {
     // If we have a valid song that we can play...
-    if (currentTrack !== null && deviceId !== null) {
+    if (deviceId === null) return;
+    if (currentTrack !== null) {
       // Send request to Spotify to play the song.
       spotifyHTTP.put(
         'me/player/play',
@@ -145,6 +146,8 @@ export default function Control({
       );
       // Mark that the song is playing.
       setPaused(false);
+    } else {
+      spotifyHTTP.put('me/player/pause');
     }
   }, [currentTrack, spotifyPlayer]);
 

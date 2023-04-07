@@ -63,6 +63,7 @@ export default function Player({ mashup }: { mashup: Result }) {
   useEffect(() => {
     getTracksInMashup(mashup).then((tracks) => {
       if (tracks.length !== 0) setCurrentTrack(0);
+      else setCurrentTrack(null);
       setTracks(tracks);
     });
   }, [mashup]);

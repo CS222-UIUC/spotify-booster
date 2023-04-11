@@ -1,4 +1,7 @@
+import { SpotifyAPI } from '../spotify_authentication/spotify_api_import';
+
 import { SourceType } from './generate_mashup';
+import { spotify_api_config } from '../config/config';
 
 /**
  * getAlbumTracks() - Gets the track_ids of an album
@@ -7,7 +10,35 @@ import { SourceType } from './generate_mashup';
  * @returns Promise resolving to array of strings represeting spotify track_ids
  */
 async function getAlbumTracks(album_id: string, access_token: string): Promise<Array<string>> {
-  return Promise.resolve([]);
+  const spotify_api = new SpotifyAPI({
+    clientId: spotify_api_config.client_id,
+    clientSecret: spotify_api_config.client_secret,
+    redirectUri: spotify_api_config.redirect_url,
+  });
+  spotify_api.setAccessToken(access_token);
+
+  const album_info = await spotify_api.getAlbum(album_id);
+
+  const fetch_track_info = [];
+  for (let i = 0; i < album_info.body.total_tracks; i += 50) {
+    fetch_track_info.push(
+      spotify_api.getAlbumTracks(album_id, {
+        limit: 50,
+        offset: i,
+      })
+    );
+  }
+
+  const track_info_responses = await Promise.all(fetch_track_info);
+
+  const tracks = [];
+  for (const track_info_res of track_info_responses) {
+    for (const track of track_info_res.body.items) {
+      tracks.push(track.id);
+    }
+  }
+
+  return tracks;
 }
 
 /**
@@ -16,8 +47,22 @@ async function getAlbumTracks(album_id: string, access_token: string): Promise<A
  * @param access_token - spotify api access token
  * @returns Promise resolving to array of strings represeting spotify track_ids
  */
-async function getPlaylistTracks(playlist_id: String, access_token: string): Promise<Array<string>> {
-  return Promise.resolve([]);
+async function getPlaylistTracks(playlist_id: string, access_token: string): Promise<Array<string>> {
+  const spotify_api = new SpotifyAPI({
+    clientId: spotify_api_config.client_id,
+    clientSecret: spotify_api_config.client_secret,
+    redirectUri: spotify_api_config.redirect_url,
+  });
+  spotify_api.setAccessToken(access_token);
+
+  const playlist_info = await spotify_api.getPlaylist(playlist_id);
+
+  const tracks = [];
+  for (const { track } of playlist_info.body.tracks.items) {
+    tracks.push(track.id);
+  }
+
+  return tracks;
 }
 
 /**
@@ -32,5 +77,15 @@ export default async function getSourceTracks(
   source_type: SourceType,
   access_token: string
 ): Promise<Array<string>> {
-  return Promise.resolve([]);
+  switch (source_type) {
+    case SourceType.Album: {
+      return await getAlbumTracks(source_id, access_token);
+    }
+    case SourceType.Playlist: {
+      return await getPlaylistTracks(source_id, access_token);
+    }
+    default: {
+      throw new Error('Source Type Invalid');
+    }
+  }
 }

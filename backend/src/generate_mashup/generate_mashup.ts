@@ -1,5 +1,6 @@
 import DatabaseInterface from '../database_interface/database_interface';
 import Logger from '../logger/logger';
+import getSourceTracks from './get_source_tracks';
 
 export enum SourceType {
   Album = 0,
@@ -24,5 +25,6 @@ export default async function GenerateMashup(
   db: DatabaseInterface,
   log: Logger
 ): Promise<void> {
+  const tracks = await getSourceTracks(source_id, source_type, access_token);
   return Promise.resolve();
 }

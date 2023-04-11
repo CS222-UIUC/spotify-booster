@@ -2,10 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { SpotifyAPI } from './spotify_api_import';
 
 import Logger from '../logger/logger';
-
-const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
-const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
-const SPOTIFY_REDIRECT_URL = process.env.SPOTIFY_REDIRECT_URL;
+import { spotify_api_config } from '../config/config';
 
 /**
  * isEmpty() - checks if a string is empty or only contains whitespace
@@ -43,9 +40,9 @@ function getAccessToken(req: Request): string {
  */
 async function getSpotifyUID(spotify_access_token: string): Promise<string> {
   const spotify_api = new SpotifyAPI({
-    clientId: SPOTIFY_CLIENT_ID,
-    clientSecret: SPOTIFY_CLIENT_SECRET,
-    redirectUri: SPOTIFY_REDIRECT_URL,
+    clientId: spotify_api_config.client_id,
+    clientSecret: spotify_api_config.client_secret,
+    redirectUri: spotify_api_config.redirect_url,
   });
   spotify_api.setAccessToken(spotify_access_token);
 

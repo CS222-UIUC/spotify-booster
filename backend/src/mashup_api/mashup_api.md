@@ -34,6 +34,38 @@ POST: /mashupapi/createMashup?name=mashup_name
 | 403 | FORBIDDEN (user probably does not have access to view/edit mashup) |
 | 500 | INTERNAL SERVER ERROR |
 
+
+## Generate Mashup
+Generates a tracks for mashup
+```http
+POST: /mashupapi/generateMashup?mashup_id=45a87c57-aeaf-416a-a7af-7787e9a2a4f4&start_track_id=7mo7AdBOTne5yjuHyteVvy&source_id=00TQ8IydoicWjAjVN0keHr&source_type=0
+```
+| Parameter | Type | Description |
+| :--- | :--- | :--- |
+| mashup_id | `string` | Mashup id of mashup to save generated mashup to |
+| start_track_id | `string` | Track id of song mashup should start with |
+| source_id | `string` | Spotify id of track source to use to generate mashup (Album or Playlist) |
+| source_type | `integer` | Type of source to use (0 = Album, 1 = Playlist) |
+
+### Response
+```js
+{
+  "error_message": string
+}
+```
+
+`"error_message"` contains an error message if there was an error
+
+### Status Codes
+| Code | Description |
+| :--- | :--- |
+| 200 | OK |
+| 400 | BAD REQUEST (name was probably invalid) |
+| 401 | UNAUTHORIZED (`"spotify_access_token"` cookie probably was not set correctly) |
+| 403 | FORBIDDEN (user probably does not have access to view/edit mashup) |
+| 500 | INTERNAL SERVER ERROR |
+
+
 ## Get Users Mashups
 Gets users mashups
 ```http
@@ -76,7 +108,7 @@ type MashupInfo = {
 ## Get Mashup Name
 Fetches the name of a given mashup
 ```http
-Get: /mashupapi/getMashupName?mashup_id=MTUxODVkMzFmZDc2MGUwNjg2YjFiMTFjZTRkNzYxMjAzNjJmYjc5NTU4ZTg4MGVhODBiOGE4NDAwYmNlM2FjZg
+Get: /mashupapi/getMashupName?mashup_id=45a87c57-aeaf-416a-a7af-7787e9a2a4f4
 ```
 | Parameter | Type | Description |
 | :--- | :--- | :--- |
@@ -146,7 +178,7 @@ type MashupInfo = {
 ## Set Mashup Name
 Updates the name of a given mashup
 ```http
-PUT: /mashupapi/setMashupName?name=new_name&mashup_id=MTUxODVkMzFmZDc2MGUwNjg2YjFiMTFjZTRkNzYxMjAzNjJmYjc5NTU4ZTg4MGVhODBiOGE4NDAwYmNlM2FjZg
+PUT: /mashupapi/setMashupName?name=new_name&mashup_id=45a87c57-aeaf-416a-a7af-7787e9a2a4f4
 ```
 | Parameter | Type | Description |
 | :--- | :--- | :--- |
@@ -172,7 +204,7 @@ PUT: /mashupapi/setMashupName?name=new_name&mashup_id=MTUxODVkMzFmZDc2MGUwNjg2Yj
 ## Delete Mashup
 Deletes the given mashup
 ```http
-DELETE: /mashupapi/deleteMashup?mashup_id=MTUxODVkMzFmZDc2MGUwNjg2YjFiMTFjZTRkNzYxMjAzNjJmYjc5NTU4ZTg4MGVhODBiOGE4NDAwYmNlM2FjZg
+DELETE: /mashupapi/deleteMashup?mashup_id=45a87c57-aeaf-416a-a7af-7787e9a2a4f4
 ```
 | Parameter | Type | Description |
 | :--- | :--- | :--- |
@@ -196,7 +228,7 @@ DELETE: /mashupapi/deleteMashup?mashup_id=MTUxODVkMzFmZDc2MGUwNjg2YjFiMTFjZTRkNz
 
 ## Get Mashup Tracks
 ```http
-Get: /mashupapi/getMashupTracks?mashup_id=MTUxODVkMzFmZDc2MGUwNjg2YjFiMTFjZTRkNzYxMjAzNjJmYjc5NTU4ZTg4MGVhODBiOGE4NDAwYmNlM2FjZg
+Get: /mashupapi/getMashupTracks?mashup_id=45a87c57-aeaf-416a-a7af-7787e9a2a4f4
 ```
 | Parameter | Type | Description |
 | :--- | :--- | :--- |
@@ -237,7 +269,7 @@ type TrackInfo = {
 ## Add Track
 Adds a new track in the given mashup
 ```http
-PUT: /mashupapi/addTrack?track_id=6wmcrRId5aeo7hiEqHAtEO&mashup_id=MTUxODVkMzFmZDc2MGUwNjg2YjFiMTFjZTRkNzYxMjAzNjJmYjc5NTU4ZTg4MGVhODBiOGE4NDAwYmNlM2FjZg
+PUT: /mashupapi/addTrack?track_id=6wmcrRId5aeo7hiEqHAtEO&mashup_id=45a87c57-aeaf-416a-a7af-7787e9a2a4f4
 ```
 | Parameter | Type | Description |
 | :--- | :--- | :--- |
@@ -264,7 +296,7 @@ PUT: /mashupapi/addTrack?track_id=6wmcrRId5aeo7hiEqHAtEO&mashup_id=MTUxODVkMzFmZ
 ## Set Track Start MS
 Sets start time of track
 ```http
-PUT: /mashupapi/setStartMs?track_id=6wmcrRId5aeo7hiEqHAtEO&mashup_id=MTUxODVkMzFmZDc2MGUwNjg2YjFiMTFjZTRkNzYxMjAzNjJmYjc5NTU4ZTg4MGVhODBiOGE4NDAwYmNlM2FjZg&start_ms=123
+PUT: /mashupapi/setStartMs?track_id=6wmcrRId5aeo7hiEqHAtEO&mashup_id=45a87c57-aeaf-416a-a7af-7787e9a2a4f4&start_ms=123
 ```
 | Parameter | Type | Description |
 | :--- | :--- | :--- |
@@ -293,7 +325,7 @@ PUT: /mashupapi/setStartMs?track_id=6wmcrRId5aeo7hiEqHAtEO&mashup_id=MTUxODVkMzF
 ## Set Track End MS
 Sets end time of track
 ```http
-PUT: /mashupapi/setEndMs?track_id=6wmcrRId5aeo7hiEqHAtEO&mashup_id=MTUxODVkMzFmZDc2MGUwNjg2YjFiMTFjZTRkNzYxMjAzNjJmYjc5NTU4ZTg4MGVhODBiOGE4NDAwYmNlM2FjZg&end_ms=123
+PUT: /mashupapi/setEndMs?track_id=6wmcrRId5aeo7hiEqHAtEO&mashup_id=45a87c57-aeaf-416a-a7af-7787e9a2a4f4&end_ms=123
 ```
 | Parameter | Type | Description |
 | :--- | :--- | :--- |
@@ -321,7 +353,7 @@ PUT: /mashupapi/setEndMs?track_id=6wmcrRId5aeo7hiEqHAtEO&mashup_id=MTUxODVkMzFmZ
 ## Remove Track
 Removes a given track in the given mashup
 ```http
-DELETE: /mashupapi/removeTrack?track_id=6wmcrRId5aeo7hiEqHAtEO&mashup_id=MTUxODVkMzFmZDc2MGUwNjg2YjFiMTFjZTRkNzYxMjAzNjJmYjc5NTU4ZTg4MGVhODBiOGE4NDAwYmNlM2FjZg
+DELETE: /mashupapi/removeTrack?track_id=6wmcrRId5aeo7hiEqHAtEO&mashup_id=45a87c57-aeaf-416a-a7af-7787e9a2a4f4
 ```
 | Parameter | Type | Description |
 | :--- | :--- | :--- |

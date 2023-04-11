@@ -4,6 +4,7 @@ import DatabaseInterface from '../database_interface/database_interface';
 import Logger from '../logger/logger';
 import { AuthRequest } from '../spotify_authentication/spotify_authentication';
 import { runAuthMashupAPIFunction, runMashupAPIFunction } from './mashup_api_util';
+import GenerateMashup from '../generate_mashup/generate_mashup';
 
 /**
  * createMashupsRouter() - Returns router for mashup part of mashup api
@@ -71,6 +72,20 @@ export default function createMashupsRouter(log: Logger, db: DatabaseInterface) 
       const mashup_id = await db.createMashup(name, req.spotify_uid);
       return { code: 200, res: { mashup_id } };
     })
+  );
+
+  router.post(
+    '/mashupapi/generateMashup',
+    runAuthMashupAPIFunction(async (req: AuthRequest) => {
+      const mashup_id = req.query.mashup_id as string;
+      const start_track_id = req.query.start_track_id as string;
+      const source_id = req.query.source_id as string;
+      const source_type = parseInt(req.query.source_type as string);
+
+      await GenerateMashup(mashup_id, start_track_id, source_id, source_type, req.spotify_uid, db, log);
+
+      return { code: 200, res: {} };
+    }, auth_function)
   );
 
   router.delete(

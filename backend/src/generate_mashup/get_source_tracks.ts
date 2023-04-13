@@ -20,6 +20,7 @@ async function getAlbumTracks(album_id: string, access_token: string): Promise<A
   const album_info = await spotify_api.getAlbum(album_id);
 
   const fetch_track_info = [];
+  // tracks split into chunks of 50 for albums, need to fetch them all
   for (let i = 0; i < album_info.body.total_tracks; i += 50) {
     fetch_track_info.push(
       spotify_api.getAlbumTracks(album_id, {
@@ -31,6 +32,7 @@ async function getAlbumTracks(album_id: string, access_token: string): Promise<A
 
   const track_info_responses = await Promise.all(fetch_track_info);
 
+  // pull out just track id
   const tracks = [];
   for (const track_info_res of track_info_responses) {
     for (const track of track_info_res.body.items) {

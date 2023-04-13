@@ -61,13 +61,13 @@ describe('Get Source Tracks', () => {
 
   describe('API Errors', () => {
     it('should throw error if api returns error', async function () {
-      throwError({ getAlbum: true, getAlbumTracks: false, getPlaylist: false });
+      throwError({ getAlbum: true, getAlbumTracks: false, getPlaylist: false, getAudioAnalysisForTrack: false });
       assert.isRejected(getSourceTracks('long_album_id', SourceType.Album, this.access_token), 'Get Album Failed');
 
-      throwError({ getAlbum: false, getAlbumTracks: true, getPlaylist: false });
+      throwError({ getAlbum: false, getAlbumTracks: true, getPlaylist: false, getAudioAnalysisForTrack: false });
       assert.isRejected(getSourceTracks('long_album_id', SourceType.Album, this.access_token), 'Get Album Tracks Failed');
 
-      throwError({ getAlbum: false, getAlbumTracks: false, getPlaylist: true });
+      throwError({ getAlbum: false, getAlbumTracks: false, getPlaylist: true, getAudioAnalysisForTrack: false });
       assert.isRejected(getSourceTracks('some_playlist_id', SourceType.Playlist, this.access_token), 'Get Playlist Failed');
     });
   });

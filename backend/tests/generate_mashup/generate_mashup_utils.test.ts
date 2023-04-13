@@ -1,6 +1,7 @@
 import sinon from 'sinon';
 
 import * as SpotifyAPI from '../../src/spotify_authentication/spotify_api_import';
+import { SectionProps } from '../../src/generate_mashup/get_track_sections';
 
 const long_album_tracks: Array<string> = [];
 for (let i = 0; i < 51; i++) long_album_tracks.push(`long_album_track${i}`);
@@ -11,14 +12,46 @@ for (let i = 0; i < 50; i++) short_album_tracks.push(`short_album_track${i}`);
 const playlist_tracks: Array<string> = [];
 for (let i = 0; i < 100; i++) long_album_tracks.push(`playlist_track${i}`);
 
-export { long_album_tracks, short_album_tracks, playlist_tracks };
+const section_props: Array<SectionProps> = [];
+for (let i = 0; i < 12; i++) {
+  section_props.push({
+    start: i * 10.5, // some float >=0
+    end: (i + 1) * 10.5,
+    loudness: -1 * (i + 1), // some float <0
+    tempo: (i + 1) * 10.5, // some float >0
+    key: i, // integers 0-11 (inclusive)
+    mode: -1 + (i % 3), // possible values are -1, 0, 1
+    time_signature: 3 + (i % 5), // possible values are 3, 4, 5, 6, 7
+  });
+}
+
+// Compares two section properties objects
+export function compareSectionProps(a: SectionProps, e: SectionProps) {
+  return (
+    a.start === e.start &&
+    a.end === e.end &&
+    a.loudness === e.loudness &&
+    a.tempo === e.tempo &&
+    a.key === e.key &&
+    a.mode === e.mode &&
+    a.time_signature === e.time_signature
+  );
+}
+
+export { long_album_tracks, short_album_tracks, playlist_tracks, section_props };
 
 let throw_error = {
   getAlbum: false,
   getAlbumTracks: false,
   getPlaylist: false,
+  getAudioAnalysisForTrack: false,
 };
-export function throwError(te: { getAlbum?: boolean; getAlbumTracks?: boolean; getPlaylist?: boolean }) {
+export function throwError(te: {
+  getAlbum: boolean;
+  getAlbumTracks: boolean;
+  getPlaylist: boolean;
+  getAudioAnalysisForTrack: boolean;
+}) {
   throw_error = Object.assign(throw_error, te);
 }
 
@@ -109,7 +142,7 @@ const getAlbumTracks = (album_id: string, options: { limit: number; offset: numb
  *
  * Throws an error if throw_error.getPlaylist is true
  *
- * @param album_id - album_id of album to get
+ * @param playlist_id - playlist_id of playlist to get
  * @returns - promise resolving to object similar to spotify_api response
  */
 const getPlaylist = (playlist_id: string) => {
@@ -135,6 +168,24 @@ const getPlaylist = (playlist_id: string) => {
 };
 
 /**
+ * getAudioAnalysisForTrack() - Stub of getAudioAnalysisForTrack method of spotify_api
+ * Throws an error if throw_error.getAudioAnalysisForTrack is true
+ * @returns - promise resolving to object similar to spotify_api response
+ */
+const getAudioAnalysisForTrack = () => {
+  if (throw_error.getAudioAnalysisForTrack) return Promise.reject(new Error('Get Track Analysis Failed'));
+  return Promise.resolve({
+    body: {
+      sections: section_props.map((section) => {
+        const s = Object.assign({ duration: 10.5 }, section);
+        delete s.end;
+        return s;
+      }),
+    },
+  });
+};
+
+/**
  * stubSpotifyAPI() - Stubs constructor for spotify_api to return stubbed spotify_api object
  * Throws an error if the provided access token does not the expected one
  * @param expected_access_token - the expected access_token to be passed to spotify_api
@@ -149,6 +200,7 @@ export function stubSpotifyAPI(expected_access_token: string) {
       getAlbum,
       getAlbumTracks,
       getPlaylist,
+      getAudioAnalysisForTrack,
     };
   });
 }

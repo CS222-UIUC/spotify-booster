@@ -41,10 +41,10 @@ export function fetchLogs(logger_name: string): { debug: Array<LogProperties>; i
   const date_string = formatDate(Date.now());
   const debug_logs = fs
     .readFileSync(path.join(LOG_FILE_DIRECTORY, `${logger_name}-Debug-${date_string}.log`), 'utf-8')
-    .split('\r');
+    .split(/\n|\r/);
   const info_logs = fs
     .readFileSync(path.join(LOG_FILE_DIRECTORY, `${logger_name}-Info-${date_string}.log`), 'utf-8')
-    .split('\r');
+    .split(/\n|\r/);
 
   const debug: Array<LogProperties> = [];
   const info: Array<LogProperties> = [];

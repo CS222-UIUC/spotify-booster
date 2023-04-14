@@ -10,7 +10,7 @@ const short_album_tracks: Array<string> = [];
 for (let i = 0; i < 50; i++) short_album_tracks.push(`short_album_track${i}`);
 
 const playlist_tracks: Array<string> = [];
-for (let i = 0; i < 100; i++) long_album_tracks.push(`playlist_track${i}`);
+for (let i = 0; i < 100; i++) playlist_tracks.push(`playlist_track${i}`);
 
 const section_props: Array<SectionProps> = [];
 for (let i = 0; i < 1; i++) {
@@ -140,7 +140,7 @@ const getPlaylist = (playlist_id: string) => {
       body: {
         tracks: {
           items: playlist_tracks.map((id) => {
-            return { id };
+            return { track: { id } };
           }),
         },
       },

@@ -41,7 +41,7 @@ describe('Get Source Tracks', () => {
     });
 
     it('should get all tracks of playlist', async function () {
-      const tracks = await getSourceTracks('some_playlist_id', SourceType.Album, this.access_token);
+      const tracks = await getSourceTracks('some_playlist_id', SourceType.Playlist, this.access_token);
 
       arraysMatchUnordered(tracks, playlist_tracks, 'Playlist Tracks');
     });

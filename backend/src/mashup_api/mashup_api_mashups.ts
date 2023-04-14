@@ -82,7 +82,7 @@ export default function createMashupsRouter(log: Logger, db: DatabaseInterface) 
       const source_id = req.query.source_id as string;
       const source_type = parseInt(req.query.source_type as string);
 
-      await GenerateMashup(mashup_id, start_track_id, source_id, source_type, req.spotify_uid, db, log);
+      await GenerateMashup(mashup_id, start_track_id, source_id, source_type, req.cookies.spotify_access_token, db, log);
 
       return { code: 200, res: {} };
     }, auth_function)

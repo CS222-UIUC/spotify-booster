@@ -2,6 +2,7 @@ import { assert } from 'chai';
 import request from 'supertest';
 import path from 'path';
 import express from 'express';
+import sinon from 'sinon';
 
 import createMashupRouter from '../../src/mashup_api/mashup_api';
 import { createDirectory, removeDirectory } from '../test_utils/hooks/create_test_directory.test';
@@ -10,6 +11,7 @@ import { createLoggerStub, stubLogger } from '../test_utils/stubs/stub_logger.te
 import uniqueID from '../test_utils/unique_id.test';
 import { stubSpotifyAuth } from '../test_utils/stubs/stub_spotify_auth.test';
 import { createEmptyMashup } from './mashup_api_utils.test';
+import * as GenerateMashup from '../../src/generate_mashup/generate_mashup';
 
 const TEST_DIRECTORY = path.join(__dirname, 'test_mashup_api_mashups');
 
@@ -26,6 +28,7 @@ describe('Mashup API Authentication', () => {
       },
     });
     stubSpotifyAuth('valid_user_id');
+    sinon.stub(GenerateMashup, 'default').callsFake(sinon.spy());
 
     const { db, mashup_api } = await createMashupRouter(createLoggerStub());
 
@@ -37,6 +40,10 @@ describe('Mashup API Authentication', () => {
 
     this.test_requests = [
       { method: 'get', path: `/mashupapi/getMashupName?mashup_id=${this.mashup_id}` },
+      {
+        method: 'post',
+        path: `/mashupapi/generateMashup?mashup_id=${this.mashup_id}&start_track_id=start_track_id&source_id=source_id&source_type=0`,
+      },
       { method: 'put', path: `/mashupapi/setMashupName?mashup_id=${this.mashup_id}&name=new_name` },
       { method: 'get', path: `/mashupapi/getMashupTracks?mashup_id=${this.mashup_id}` },
       { method: 'put', path: `/mashupapi/addTrack?mashup_id=${this.mashup_id}&track_id=track_id` },

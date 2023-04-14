@@ -13,6 +13,7 @@ import { stubSpotifyAuth } from '../test_utils/stubs/stub_spotify_auth.test';
 import { createEmptyMashup } from './mashup_api_utils.test';
 import { arraysMatchUnordered } from '../test_utils/assertions/arrays_match.test';
 import { matchUserMashup } from '../database_interface/database_interface_utils.test';
+import * as GenerateMashup from '../../src/generate_mashup/generate_mashup';
 
 const TEST_DIRECTORY = path.join(__dirname, 'test_mashup_api_mashups');
 
@@ -88,6 +89,71 @@ describe('Mashup API Mashups', () => {
 
       assert.equal(response.statusCode, 400, 'Responds with bad request code');
       assert.equal(response.body.error_message, 'Invalid Mashup Name', 'Responds with error message');
+    });
+  });
+
+  describe('Mashup API Generate Mashup', () => {
+    it('calls generate mashup method', async function () {
+      const spy = sinon.spy();
+      sinon.stub(GenerateMashup, 'default').callsFake(spy);
+
+      const mashup_id = 'mashup_id';
+      const start_track_id = 'track_id';
+      const source_id = 'source_id';
+      const source_type = '0';
+
+      const req = request.agent(this.app);
+      const response = await req
+        .post(
+          `/mashupapi/generateMashup?mashup_id=${mashup_id}&start_track_id=${start_track_id}&source_id=${source_id}&source_type=${source_type}`
+        )
+        .set('Cookie', 'spotify_access_token=valid_token')
+        .send();
+
+      assert.equal(response.statusCode, 200, 'Responds with success status code');
+      assert.equal(spy.callCount, 1, 'GenerateMashup called once');
+      assert.equal(spy.getCall(0).args[0], mashup_id, 'GenerateMashup called with correct arg 0');
+      assert.equal(spy.getCall(0).args[1], start_track_id, 'GenerateMashup called with correct arg 1');
+      assert.equal(spy.getCall(0).args[2], source_id, 'GenerateMashup called with correct arg 2');
+      assert.equal(spy.getCall(0).args[3], source_type, 'GenerateMashup called with correct arg 3');
+      assert.equal(spy.getCall(0).args[4], 'valid_token', 'GenerateMashup called with correct arg 4');
+    });
+
+    it('returns error when source_type is not valid integer', async function () {
+      const mashup_id = 'mashup_id';
+      const start_track_id = 'track_id';
+      const source_id = 'source_id';
+      const source_type = 'asdf';
+
+      const req = request.agent(this.app);
+      const response = await req
+        .post(
+          `/mashupapi/generateMashup?mashup_id=${mashup_id}&start_track_id=${start_track_id}&source_id=${source_id}&source_type=${source_type}`
+        )
+        .set('Cookie', 'spotify_access_token=valid_token')
+        .send();
+
+      assert.equal(response.statusCode, 400, 'Responds with bad request code');
+    });
+
+    it('returns error when generateMashup function throws error', async function () {
+      sinon.stub(GenerateMashup, 'default').rejects(new Error('Some Error'));
+
+      const mashup_id = 'mashup_id';
+      const start_track_id = 'track_id';
+      const source_id = 'source_id';
+      const source_type = '0';
+
+      const req = request.agent(this.app);
+      const response = await req
+        .post(
+          `/mashupapi/generateMashup?mashup_id=${mashup_id}&start_track_id=${start_track_id}&source_id=${source_id}&source_type=${source_type}`
+        )
+        .set('Cookie', 'spotify_access_token=valid_token')
+        .send();
+
+      assert.equal(response.statusCode, 400, 'Responds with bad request code');
+      assert.equal(response.body.error_message, 'Some Error');
     });
   });
 

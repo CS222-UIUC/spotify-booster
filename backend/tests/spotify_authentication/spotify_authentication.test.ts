@@ -1,6 +1,7 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 
+import { Response } from 'express';
 import createSpotifyAuthenticator, { AuthRequest } from '../../src/spotify_authentication/spotify_authentication';
 import { createLoggerStub } from '../test_utils/stubs/stub_logger.test';
 import { stubSpotifyAPI } from './spotify_authentication_utils.test';

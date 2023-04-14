@@ -1,6 +1,7 @@
 import DatabaseInterface from '../database_interface/database_interface';
 import { TrackInfo } from '../database_interface/track_db_interface';
 import Logger from '../logger/logger';
+import { awaitAllPromises } from '../utils';
 import findOptimalMashup from './find_optimal_mashup';
 import getSourceTracks from './get_source_tracks';
 import getTrackSections, { SectionProps } from './get_track_sections';
@@ -56,7 +57,7 @@ async function getAllSections(source_id: string, tracks: Array<string>, access_t
         await_track_sections.push(getTrackSections(tracks[j], access_token));
       }
 
-      track_sections = [...track_sections, ...(await Promise.all(await_track_sections))];
+      track_sections = [...track_sections, ...(await awaitAllPromises(await_track_sections))];
     }
 
     profile.stop();

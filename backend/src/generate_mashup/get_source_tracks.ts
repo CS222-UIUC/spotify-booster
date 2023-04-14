@@ -1,4 +1,5 @@
 import { SpotifyAPI } from '../spotify_authentication/spotify_api_import';
+import { awaitAllPromises } from '../utils';
 
 import { SourceType } from './generate_mashup';
 import { spotify_api_config } from '../config/config';
@@ -30,7 +31,7 @@ async function getAlbumTracks(album_id: string, access_token: string): Promise<A
     );
   }
 
-  const track_info_responses = await Promise.all(fetch_track_info);
+  const track_info_responses = await awaitAllPromises(fetch_track_info);
 
   // pull out just track id
   const tracks = [];

@@ -4,7 +4,10 @@
 		"outDir": "./build/",
 		"module": "CommonJS",
 		"allowJs": true,
-		"target": "es6",
+		"lib": [
+			"es2020"
+		],
+		"target": "es2020",
 		"declaration": true,
 		"sourceMap": true,
 		"forceConsistentCasingInFileNames": true,

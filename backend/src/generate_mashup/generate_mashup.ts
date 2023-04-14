@@ -8,6 +8,7 @@ import getTrackSections, { SectionProps } from './get_track_sections';
 import saveToDb from './save_to_db';
 
 const BATCH_REQUEST_AMOUNT = 10; // number of spotify_api requests to send at one moment to get track sections
+const BATCH_REQUEST_INTERVAL_MS = 500; // number of milliseconds to wait before sending another batck of requests
 
 export enum SourceType {
   Album = 0,
@@ -58,6 +59,10 @@ async function getAllSections(source_id: string, tracks: Array<string>, access_t
       }
 
       track_sections = [...track_sections, ...(await awaitAllPromises(await_track_sections))];
+
+      await new Promise((resolve) => {
+        setTimeout(resolve, BATCH_REQUEST_INTERVAL_MS);
+      });
     }
 
     profile.stop();

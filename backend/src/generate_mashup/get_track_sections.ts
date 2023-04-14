@@ -4,8 +4,8 @@ import { spotify_api_config } from '../config/config';
 
 // Spotify Track Section Properties (refer to spotify api docs)
 export type SectionProps = {
-  start: number;
-  end: number;
+  start_ms: number;
+  end_ms: number;
   loudness: number;
   tempo: number;
   key: number;
@@ -31,8 +31,8 @@ export default async function getTrackSections(track_id: string, access_token: s
 
   return analysis.body.sections.map((section) => {
     return {
-      start: section.start,
-      end: section.start + section.duration,
+      start_ms: Math.floor(section.start * 1000),
+      end_ms: Math.floor((section.start + section.duration) * 1000),
       loudness: section.loudness,
       tempo: section.tempo,
       key: section.key,

@@ -3,13 +3,7 @@ import { assert } from 'chai';
 import { SourceType } from '../../src/generate_mashup/generate_mashup';
 import getSourceTracks from '../../src/generate_mashup/get_source_tracks';
 
-import {
-  long_album_tracks,
-  playlist_tracks,
-  short_album_tracks,
-  stubSpotifyAPI,
-  throwError,
-} from './generate_mashup_utils.test';
+import { long_album_tracks, playlist_tracks, short_album_tracks, stubSpotifyAPI, throwError } from './stub_spotify_api.test';
 import { arraysMatchUnordered } from '../test_utils/assertions/arrays_match.test';
 
 describe('Get Source Tracks', () => {
@@ -62,13 +56,19 @@ describe('Get Source Tracks', () => {
   describe('API Errors', () => {
     it('should throw error if api returns error', async function () {
       throwError({ getAlbum: true, getAlbumTracks: false, getPlaylist: false, getAudioAnalysisForTrack: false });
-      assert.isRejected(getSourceTracks('long_album_id', SourceType.Album, this.access_token), 'Get Album Failed');
+      await assert.isRejected(getSourceTracks('long_album_id', SourceType.Album, this.access_token), 'Get Album Failed');
 
       throwError({ getAlbum: false, getAlbumTracks: true, getPlaylist: false, getAudioAnalysisForTrack: false });
-      assert.isRejected(getSourceTracks('long_album_id', SourceType.Album, this.access_token), 'Get Album Tracks Failed');
+      await assert.isRejected(
+        getSourceTracks('long_album_id', SourceType.Album, this.access_token),
+        'Get Album Tracks Failed'
+      );
 
       throwError({ getAlbum: false, getAlbumTracks: false, getPlaylist: true, getAudioAnalysisForTrack: false });
-      assert.isRejected(getSourceTracks('some_playlist_id', SourceType.Playlist, this.access_token), 'Get Playlist Failed');
+      await assert.isRejected(
+        getSourceTracks('some_playlist_id', SourceType.Playlist, this.access_token),
+        'Get Playlist Failed'
+      );
     });
   });
 });

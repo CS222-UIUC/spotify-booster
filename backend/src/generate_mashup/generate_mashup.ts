@@ -103,7 +103,7 @@ async function findOptimal(
 
 // Wraps saveToDb function for logging and error handling
 async function save(source_id: string, db: DatabaseInterface, mashup_id: string, tracks: Array<TrackInfo>, log: Logger) {
-  const profile = log.profile('Save Generated Mashup to Database', { warn: 1000, error: 5000 });
+  const profile = log.profile('Save Generated Mashup to Database', { warn: 5000, error: 10000 });
 
   try {
     await saveToDb(db, mashup_id, tracks);

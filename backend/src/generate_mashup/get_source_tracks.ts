@@ -61,8 +61,8 @@ async function getPlaylistTracks(playlist_id: string, access_token: string): Pro
   const playlist_info = await spotify_api.getPlaylist(playlist_id);
 
   const tracks = [];
-  for (const { track } of playlist_info.body.tracks.items) {
-    tracks.push(track.id);
+  for (const item of playlist_info.body.tracks.items) {
+    if (item.track) tracks.push(item.track.id);
   }
 
   return tracks;

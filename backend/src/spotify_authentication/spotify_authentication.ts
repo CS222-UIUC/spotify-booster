@@ -71,6 +71,7 @@ export default function createSpotifyAuthenticator(log: Logger) {
       spotify_access_token = getAccessToken(req);
     } catch (error) {
       log.warn(`Request from ${from_ip} failed authentication`, error);
+      res.status(401).send({ error_message: error.message });
       return;
     }
 
@@ -78,6 +79,7 @@ export default function createSpotifyAuthenticator(log: Logger) {
       req.spotify_uid = await getSpotifyUID(spotify_access_token);
     } catch (error) {
       log.warn(`Request from ${from_ip} failed authentication`, error);
+      res.status(401).send({ error_message: error.message });
       return;
     }
 

@@ -113,7 +113,7 @@ async function save(source_id: string, db: DatabaseInterface, mashup_id: string,
     log.error(`Failed while saving generated mashup for source_id: ${source_id}`, error);
     profile.stop({ success: false, level: 'error' });
 
-    throw new Error('Failed To Save Mashup');
+    throw new Error('Failed To Save Mashup: ' + error.message);
   }
 }
 

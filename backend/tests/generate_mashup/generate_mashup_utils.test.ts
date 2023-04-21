@@ -1,3 +1,4 @@
+import { TrackInfo } from '../../src/database_interface/track_db_interface';
 import { SectionProps } from '../../src/generate_mashup/get_track_sections';
 
 // Compares two section properties objects
@@ -23,4 +24,16 @@ export function compareAllTrackSections(a: Array<SectionProps>, e: Array<Section
     }
   }
   return true;
+}
+
+// Checks that a given track info matches a section and track in given section properties and track ids,
+export function trackInfoSectionExists(tracks: Array<string>, sections: Array<Array<SectionProps>>, b: TrackInfo) {
+  for (let i = 0; i < tracks.length; i++) {
+    if (tracks[i] === b.track_id) {
+      for (const section of sections[i]) {
+        if (section.start_ms === b.start_ms && section.end_ms === b.end_ms) return true;
+      }
+    }
+  }
+  return false;
 }

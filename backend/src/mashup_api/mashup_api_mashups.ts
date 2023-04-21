@@ -68,7 +68,6 @@ export default function createMashupsRouter(log: Logger, db: DatabaseInterface) 
     '/mashupapi/createMashup',
     runMashupAPIFunction(async (req: AuthRequest) => {
       const name = req.query.name as string;
-
       const mashup_id = await db.createMashup(name, req.spotify_uid);
       return { code: 200, res: { mashup_id } };
     })

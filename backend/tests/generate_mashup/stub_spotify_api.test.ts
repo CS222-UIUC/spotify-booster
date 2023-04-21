@@ -108,9 +108,11 @@ const getAlbumTracks = (album_id: string, options: { limit: number; offset: numb
   if (album_id === 'short_album_id')
     return Promise.resolve({
       body: {
-        items: short_album_tracks.slice(options.offset * 50, options.offset * 50 + options.limit).map((id) => {
-          return { id };
-        }),
+        items: [
+          ...short_album_tracks.slice(options.offset * 50, options.offset * 50 + options.limit).map((id) => {
+            return { id };
+          }),
+        ],
       },
     });
 
@@ -139,9 +141,12 @@ const getPlaylist = (playlist_id: string) => {
     return {
       body: {
         tracks: {
-          items: playlist_tracks.map((id) => {
-            return { track: { id } };
-          }),
+          items: [
+            ...playlist_tracks.map((id) => {
+              return { track: { id } };
+            }),
+            {}, // add empty item to check null handling
+          ],
         },
       },
     };

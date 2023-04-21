@@ -75,6 +75,7 @@ describe('Spotify Authentication Middleware', () => {
     });
 
     const response = await request(app).get('/test');
-    console.log(response.body);
+
+    assert.equal(response.statusCode, 401, 'Returns unauthorized status code');
   });
 });

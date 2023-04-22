@@ -17,7 +17,7 @@ export enum SourceType {
 
 // Wraps getSourceTracks for logging and error handling
 async function getTracks(source_id: string, source_type: SourceType, access_token: string, log: Logger) {
-  const profile = log.profile('Get Source Tracks', { warn: 1000, error: 5000 });
+  const profile = log.profile('Get Source Tracks', { warn: 5000, error: 10000 });
 
   let tracks;
   try {
@@ -48,7 +48,10 @@ function assertStartInSource(start_track_id: string, tracks: Array<string>) {
 
 // Wraps getTrackSections for batch requests, logging, and error handling
 async function getAllSections(source_id: string, tracks: Array<string>, access_token: string, log: Logger) {
-  const profile = log.profile('Get All Track Sections', { warn: 10000, error: 30000 });
+  const profile = log.profile('Get All Track Sections', {
+    warn: (1.1 * tracks.length * BATCH_REQUEST_INTERVAL_MS) / BATCH_REQUEST_AMOUNT,
+    error: (2 * tracks.length * BATCH_REQUEST_INTERVAL_MS) / BATCH_REQUEST_AMOUNT,
+  });
 
   let track_sections: Array<Array<SectionProps>> = [];
   try {
@@ -84,7 +87,7 @@ async function findOptimal(
   sections: Array<Array<SectionProps>>,
   log: Logger
 ) {
-  const profile = log.profile('Find Optimal Mashup', { warn: 10000, error: 3000 });
+  const profile = log.profile('Find Optimal Mashup', { warn: 10000, error: 30000 });
 
   let optimal: Array<TrackInfo>;
   try {
@@ -103,7 +106,7 @@ async function findOptimal(
 
 // Wraps saveToDb function for logging and error handling
 async function save(source_id: string, db: DatabaseInterface, mashup_id: string, tracks: Array<TrackInfo>, log: Logger) {
-  const profile = log.profile('Save Generated Mashup to Database', { warn: 5000, error: 10000 });
+  const profile = log.profile('Save Generated Mashup to Database', { warn: tracks.length * 10, error: tracks.length * 100 });
 
   try {
     await saveToDb(db, mashup_id, tracks);

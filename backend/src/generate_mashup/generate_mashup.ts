@@ -32,16 +32,12 @@ async function getTracks(source_id: string, source_type: SourceType, access_toke
   return tracks;
 }
 
-// Check that start track is in source, throws error if not
-function assertStartInSource(start_track_id: string, tracks: Array<string>) {
-  let found = false;
+// Check that start track is in source
+function startInSource(start_track_id: string, tracks: Array<string>): boolean {
   for (const track_id of tracks) {
-    if (track_id === start_track_id) {
-      found = true;
-      break;
-    }
+    if (track_id === start_track_id) return true;
   }
-  if (!found) throw new Error('Start Track Not In Source');
+  return false;
 }
 
 // Wraps getTrackSections for batch requests, logging, and error handling
@@ -138,7 +134,9 @@ export default async function GenerateMashup(
 ): Promise<void> {
   const tracks = await getTracks(source_id, source_type, access_token, log);
 
-  assertStartInSource(start_track_id, tracks);
+  if (!startInSource(start_track_id, tracks)) {
+    tracks.push(start_track_id);
+  }
 
   const sections = await getAllSections(source_id, tracks, access_token, log);
 

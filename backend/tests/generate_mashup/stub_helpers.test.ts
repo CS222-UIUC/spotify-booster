@@ -26,6 +26,18 @@ for (let i = 0; i < num_tracks; i++) {
     });
   }
 }
+const extra_track_sections: Array<getTrackSections.SectionProps> = [];
+for (let j = 0; j < 10; j++) {
+  extra_track_sections.push({
+    start_ms: j * 10.5 * 1000, // some float >=0
+    end_ms: (j + 1) * 10.5 * 1000,
+    loudness: -1 * (j + 1), // some float <0
+    tempo: (j + 1) * 10.5, // some float >0
+    key: j, // integers 0-11 (inclusive)
+    mode: -1 + (j % 3), // possible values are -1, 0, 1
+    time_signature: 3 + (j % 5), // possible values are 3, 4, 5, 6, 7
+  });
+}
 
 const optimal_mashup: Array<TrackInfo> = [];
 for (let i = num_tracks - 1; i >= 0; i--) {
@@ -36,7 +48,7 @@ for (let i = num_tracks - 1; i >= 0; i--) {
   });
 }
 
-export { source_tracks, optimal_mashup, sections };
+export { source_tracks, optimal_mashup, sections, extra_track_sections };
 
 let throw_error = {
   getSourceTracks: false,
@@ -61,21 +73,22 @@ export function throwError(te: {
 export function stubHelpers() {
   const getSourceTracksSpy = sinon.spy(() => {
     if (throw_error.getSourceTracks) return Promise.reject(new Error('Get Source Tracks Error'));
-    return Promise.resolve(source_tracks);
+    return Promise.resolve(source_tracks.map((x) => x));
   });
   sinon.stub(getSourceTracks, 'default').callsFake(getSourceTracksSpy);
 
   const getTracksSectionsSpy = sinon.spy((track_id: string) => {
     if (throw_error.getTrackSections) return Promise.reject(new Error('Get Track Sections Error'));
-
-    return Promise.resolve(sections[parseInt(track_id)]);
+    const index = parseInt(track_id);
+    if (index < num_tracks) return Promise.resolve(sections[index]);
+    else return Promise.resolve(extra_track_sections);
   });
   sinon.stub(getTrackSections, 'default').callsFake(getTracksSectionsSpy);
 
   const findOptimalMashupSpy = sinon.spy(() => {
     if (throw_error.findOptimalMashup) return Promise.reject(new Error('Find Optimal Mashup Error'));
 
-    return Promise.resolve(optimal_mashup);
+    return Promise.resolve(optimal_mashup.map((x) => x));
   });
   sinon.stub(findOptimalMashup, 'default').callsFake(findOptimalMashupSpy);
 

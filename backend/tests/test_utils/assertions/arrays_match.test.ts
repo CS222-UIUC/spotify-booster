@@ -50,6 +50,6 @@ export function arraysMatchOrdered<T>(
   assert.equal(actual.length, expected.length, `Expected${array_identifier}arrays to have same length`);
 
   for (let i = 0; i < expected.length; i++) {
-    assert(comparator(actual[i], expected[i]), `Expected ${i}-th element of ${array_identifier}array to match`);
+    assert(comparator(actual[i], expected[i]), `Expected ${i}-th element of${array_identifier}array to match`);
   }
 }

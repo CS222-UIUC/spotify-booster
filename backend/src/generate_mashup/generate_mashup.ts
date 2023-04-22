@@ -7,8 +7,8 @@ import getSourceTracks from './get_source_tracks';
 import getTrackSections, { SectionProps } from './get_track_sections';
 import saveToDb from './save_to_db';
 
-const BATCH_REQUEST_AMOUNT = 10; // number of spotify_api requests to send at one moment to get track sections
-const BATCH_REQUEST_INTERVAL_MS = 100; // number of milliseconds to wait before sending another batch of requests
+const BATCH_REQUEST_AMOUNT = 100; // number of spotify_api requests to send at one moment to get track sections
+const BATCH_REQUEST_INTERVAL_MS = 10000; // number of milliseconds to wait before sending another batch of requests
 
 export enum SourceType {
   Album = 0,
@@ -60,9 +60,9 @@ async function getAllSections(source_id: string, tracks: Array<string>, access_t
 
       track_sections = [...track_sections, ...(await awaitAllPromises(await_track_sections))];
 
-      await new Promise((resolve) => {
-        setTimeout(resolve, BATCH_REQUEST_INTERVAL_MS);
-      });
+      if (i + BATCH_REQUEST_AMOUNT < tracks.length) {
+        await new Promise((resolve) => setTimeout(resolve, BATCH_REQUEST_INTERVAL_MS));
+      }
     }
 
     profile.stop();

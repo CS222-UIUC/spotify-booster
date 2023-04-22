@@ -4,13 +4,16 @@ import * as SpotifyAPI from '../../src/spotify_authentication/spotify_api_import
 import { SectionProps } from '../../src/generate_mashup/get_track_sections';
 
 const long_album_tracks: Array<string> = [];
-for (let i = 0; i < 51; i++) long_album_tracks.push(`long_album_track${i}`);
+for (let i = 0; i < 500; i++) long_album_tracks.push(`long_album_track${i}`);
 
 const short_album_tracks: Array<string> = [];
 for (let i = 0; i < 50; i++) short_album_tracks.push(`short_album_track${i}`);
 
-const playlist_tracks: Array<string> = [];
-for (let i = 0; i < 100; i++) playlist_tracks.push(`playlist_track${i}`);
+const long_playlist_tracks: Array<string> = [];
+for (let i = 0; i < 500; i++) long_playlist_tracks.push(`playlist_track${i}`);
+
+const short_playlist_tracks: Array<string> = [];
+for (let i = 0; i < 50; i++) short_playlist_tracks.push(`playlist_track${i}`);
 
 const section_props: Array<SectionProps> = [];
 for (let i = 0; i < 1; i++) {
@@ -25,12 +28,13 @@ for (let i = 0; i < 1; i++) {
   });
 }
 
-export { long_album_tracks, short_album_tracks, playlist_tracks, section_props };
+export { long_album_tracks, short_album_tracks, long_playlist_tracks, short_playlist_tracks, section_props };
 
 let throw_error = {
   getAlbum: false,
   getAlbumTracks: false,
   getPlaylist: false,
+  getPlaylistTracks: false,
   getAudioAnalysisForTrack: false,
 };
 // Select Function to Throw Error
@@ -38,6 +42,7 @@ export function throwError(te: {
   getAlbum: boolean;
   getAlbumTracks: boolean;
   getPlaylist: boolean;
+  getPlaylistTracks: boolean;
   getAudioAnalysisForTrack: boolean;
 }) {
   throw_error = Object.assign(throw_error, te);
@@ -125,8 +130,10 @@ const getAlbumTracks = (album_id: string, options: { limit: number; offset: numb
 
 /**
  * getPlaylist() - Stub of getPlaylist method of spotify_api
- * if playlist_id = 'some_playlist_id'
- *    returns mock api response of a filled playlist
+ * if album_id = 'long_playlist_id'
+ *    returns mock api response of a long playlist (>50 tracks)
+ * if album_id = 'short_playlist_id'
+ *    returns mock api response of a short playlist (<=50 tracks)
  * otherwise
  *    return mock api response of an empty playlist
  *
@@ -137,25 +144,75 @@ const getAlbumTracks = (album_id: string, options: { limit: number; offset: numb
  */
 const getPlaylist = (playlist_id: string) => {
   if (throw_error.getPlaylist) return Promise.reject(new Error('Get Playlist Failed'));
-  if (playlist_id === 'some_playlist_id')
-    return {
+  if (playlist_id === 'long_playlist_id')
+    return Promise.resolve({
       body: {
         tracks: {
-          items: [
-            ...playlist_tracks.map((id) => {
-              return { track: { id } };
-            }),
-            {}, // add empty item to check null handling
-          ],
+          total: long_playlist_tracks.length,
         },
+      },
+    });
+
+  if (playlist_id === 'short_playlist_id')
+    return Promise.resolve({
+      body: {
+        tracks: {
+          total: short_playlist_tracks.length,
+        },
+      },
+    });
+
+  return Promise.resolve({
+    body: {
+      tracks: {
+        total: 0,
+      },
+    },
+  });
+};
+
+/**
+ * getPlaylistTracks() - Stub of getPlaylistTracks method of spotify_api
+ * if album_id = 'long_playlist_id'
+ *    returns mock api response of a long playlist (>50 tracks)
+ * if album_id = 'short_playlist_id'
+ *    returns mock api response of a short playlist (<=50 tracks)
+ * otherwise
+ *    return mock api response of an empty playlist
+ *
+ * Throws an error if throw_error.getPlaylistTracks is true
+ *
+ * @param playlist_id - playlist_id of playlist to get
+ * @returns - promise resolving to object similar to spotify_api response
+ */
+const getPlaylistTracks = (playlist_id: string, options: { limit: number; offset: number }) => {
+  if (throw_error.getPlaylistTracks) return Promise.reject(new Error('Get Playlist Tracks Failed'));
+  if (playlist_id === 'long_playlist_id')
+    return {
+      body: {
+        items: [
+          ...long_playlist_tracks.slice(options.offset, options.offset + options.limit).map((id) => {
+            return { track: { id } };
+          }),
+        ],
+      },
+    };
+
+  if (playlist_id === 'short_playlist_id')
+    return {
+      body: {
+        items: [
+          ...short_playlist_tracks.slice(options.offset, options.offset + options.limit).map((id) => {
+            return { track: { id } };
+          }),
+          {}, // add empty item to check null handling
+        ],
       },
     };
 
   return {
     body: {
-      tracks: {
-        items: [] as Array<{ id: string }>,
-      },
+      items: [] as Array<{ id: string }>,
     },
   };
 };
@@ -196,6 +253,7 @@ export function stubSpotifyAPI(expected_access_token: string) {
       getAlbum,
       getAlbumTracks,
       getPlaylist,
+      getPlaylistTracks,
       getAudioAnalysisForTrack,
     };
   });

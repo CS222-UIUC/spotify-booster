@@ -19,7 +19,13 @@ describe('Get Tracks Sections', () => {
   });
 
   it('should throw error if api returns error', async function () {
-    throwError({ getAlbum: false, getAlbumTracks: false, getPlaylist: false, getAudioAnalysisForTrack: true });
+    throwError({
+      getAlbum: false,
+      getAlbumTracks: false,
+      getPlaylist: false,
+      getPlaylistTracks: false,
+      getAudioAnalysisForTrack: true,
+    });
     await assert.isRejected(getTrackSections('some_track_id', this.access_token), 'Get Track Analysis Failed');
   });
 });

@@ -34,7 +34,7 @@ export default class SQLiteInterface {
    */
   protected async dbRun(cmd: string, params: object): Promise<RunResult> {
     await this.ready_;
-    const profiler = this.log_.profile(`Run {cmd: ${cmd}}`, { warn: 1000, error: 5000 });
+    const profiler = this.log_.profile(`Run {cmd: ${cmd}}`, { debug: 100, warn: 1000, error: 5000 });
     try {
       const result: RunResult = await new Promise((resolve, reject) => {
         this.db_.run(cmd, params, function (error) {
@@ -61,7 +61,7 @@ export default class SQLiteInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected async dbAll(cmd: string, params: object): Promise<Array<any>> {
     await this.ready_;
-    const profiler = this.log_.profile(`Fetch all rows {cmd: ${cmd}}`, { warn: 1000, error: 5000 });
+    const profiler = this.log_.profile(`Fetch all rows {cmd: ${cmd}}`, { debug: 100, warn: 1000, error: 5000 });
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const rows: Array<any> = await new Promise((resolve, reject) => {

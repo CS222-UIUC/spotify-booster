@@ -139,10 +139,7 @@ describe('Profiler', () => {
       this.debug_spy.getCall(0).calledWith('Task "profile4" completed successfully after 100 milliseconds'),
       'Logs correct message'
     );
-    assert(
-      this.debug_spy.getCall(1).calledWith('Task "profile5" completed successfully after 100 milliseconds'),
-      'Logs correct message'
-    );
+    assert.equal(this.debug_spy.callCount, 1, 'Debug only called once');
   });
 
   it('writes message with complex settings', function () {

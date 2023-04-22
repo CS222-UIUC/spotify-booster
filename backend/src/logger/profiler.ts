@@ -46,13 +46,14 @@ export default class Profiler {
     this.duration_ = Date.now() - this.start_time_;
 
     // determine level based on thresholds
-    let level = 'debug';
+    let level = 'debug'; // default to debug, unless thresholds are given
     if (this.level_thresholds_) {
+      level = '';
       if (this.duration_ >= this.level_thresholds_.fatal) level = 'fatal';
       else if (this.duration_ >= this.level_thresholds_.error) level = 'error';
       else if (this.duration_ >= this.level_thresholds_.warn) level = 'warn';
       else if (this.duration_ >= this.level_thresholds_.info) level = 'info';
-      else level = 'debug';
+      else if (this.duration_ >= this.level_thresholds_.debug) level = 'debug';
     }
     // override level if level is given explicitly
     if (options && options.level) level = options.level;

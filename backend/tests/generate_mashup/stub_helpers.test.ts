@@ -6,46 +6,37 @@ import * as findOptimalMashup from '../../src/generate_mashup/find_optimal_mashu
 import * as saveToDb from '../../src/generate_mashup/save_to_db';
 import { TrackInfo } from '../../src/database_interface/track_db_interface';
 
-const source_tracks = ['track_id0', 'track_id1', 'track_id2'];
-const optimal_mashup: Array<TrackInfo> = [
-  { track_id: 'track_id1', start_ms: 0, end_ms: 32.321 },
-  { track_id: 'track_id0', start_ms: 0, end_ms: 12.123 },
-  { track_id: 'track_id2', start_ms: 0, end_ms: 23.231 },
-];
-const track0_sections = [
-  {
-    start_ms: 0,
-    end_ms: 12.123,
-    loudness: -1.23,
-    tempo: 123,
-    key: 0,
-    mode: 0,
-    time_signature: 3,
-  },
-];
-const track1_sections = [
-  {
-    start_ms: 0,
-    end_ms: 32.321,
-    loudness: -3.21,
-    tempo: 321,
-    key: 1,
-    mode: -1,
-    time_signature: 4,
-  },
-];
-const track2_sections = [
-  {
-    start_ms: 0,
-    end_ms: 23.231,
-    loudness: -2.31,
-    tempo: 231,
-    key: 11,
-    mode: 0,
-    time_signature: 7,
-  },
-];
-export { source_tracks, optimal_mashup, track0_sections, track1_sections, track2_sections };
+const num_tracks = 200;
+
+const source_tracks: Array<string> = [];
+const sections: Array<Array<getTrackSections.SectionProps>> = [];
+for (let i = 0; i < num_tracks; i++) {
+  source_tracks.push(`${i}`);
+  sections.push([]);
+
+  for (let j = 0; j < Math.floor(i / 10) + 1; j++) {
+    sections[i].push({
+      start_ms: j * 10.5 * 1000, // some float >=0
+      end_ms: (j + 1) * 10.5 * 1000,
+      loudness: -1 * (j + 1), // some float <0
+      tempo: (j + 1) * 10.5, // some float >0
+      key: j, // integers 0-11 (inclusive)
+      mode: -1 + (j % 3), // possible values are -1, 0, 1
+      time_signature: 3 + (j % 5), // possible values are 3, 4, 5, 6, 7
+    });
+  }
+}
+
+const optimal_mashup: Array<TrackInfo> = [];
+for (let i = num_tracks - 1; i >= 0; i--) {
+  optimal_mashup.push({
+    track_id: source_tracks[i],
+    start_ms: sections[i][0].start_ms,
+    end_ms: sections[i][0].end_ms,
+  });
+}
+
+export { source_tracks, optimal_mashup, sections };
 
 let throw_error = {
   getSourceTracks: false,
@@ -77,10 +68,7 @@ export function stubHelpers() {
   const getTracksSectionsSpy = sinon.spy((track_id: string) => {
     if (throw_error.getTrackSections) return Promise.reject(new Error('Get Track Sections Error'));
 
-    if (track_id === 'track_id0') return Promise.resolve(track0_sections);
-    if (track_id === 'track_id1') return Promise.resolve(track1_sections);
-    if (track_id === 'track_id2') return Promise.resolve(track2_sections);
-    return Promise.resolve([]);
+    return Promise.resolve(sections[parseInt(track_id)]);
   });
   sinon.stub(getTrackSections, 'default').callsFake(getTracksSectionsSpy);
 

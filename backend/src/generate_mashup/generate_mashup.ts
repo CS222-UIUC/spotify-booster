@@ -1,3 +1,4 @@
+import { spotify_api_config } from '../config/config';
 import DatabaseInterface from '../database_interface/database_interface';
 import { TrackInfo } from '../database_interface/track_db_interface';
 import Logger from '../logger/logger';
@@ -6,9 +7,6 @@ import findOptimalMashup from './find_optimal_mashup';
 import getSourceTracks from './get_source_tracks';
 import getTrackSections, { SectionProps } from './get_track_sections';
 import saveToDb from './save_to_db';
-
-const BATCH_REQUEST_AMOUNT = 100; // number of spotify_api requests to send at one moment to get track sections
-const BATCH_REQUEST_INTERVAL_MS = 10000; // number of milliseconds to wait before sending another batch of requests
 
 export enum SourceType {
   Album = 0,
@@ -49,22 +47,22 @@ function assertStartInSource(start_track_id: string, tracks: Array<string>) {
 // Wraps getTrackSections for batch requests, logging, and error handling
 async function getAllSections(source_id: string, tracks: Array<string>, access_token: string, log: Logger) {
   const profile = log.profile('Get All Track Sections', {
-    warn: (1.1 * tracks.length * BATCH_REQUEST_INTERVAL_MS) / BATCH_REQUEST_AMOUNT,
-    error: (2 * tracks.length * BATCH_REQUEST_INTERVAL_MS) / BATCH_REQUEST_AMOUNT,
+    warn: (1.1 * tracks.length * spotify_api_config.batch_request_interval) / spotify_api_config.batch_request_amount,
+    error: (2 * tracks.length * spotify_api_config.batch_request_interval) / spotify_api_config.batch_request_amount,
   });
 
   let track_sections: Array<Array<SectionProps>> = [];
   try {
-    for (let i = 0; i < tracks.length; i += BATCH_REQUEST_AMOUNT) {
+    for (let i = 0; i < tracks.length; i += spotify_api_config.batch_request_amount) {
       const await_track_sections = [];
-      for (let j = i; j < tracks.length && j < i + BATCH_REQUEST_AMOUNT; j++) {
+      for (let j = i; j < tracks.length && j < i + spotify_api_config.batch_request_amount; j++) {
         await_track_sections.push(getTrackSections(tracks[j], access_token));
       }
 
       track_sections = [...track_sections, ...(await awaitAllPromises(await_track_sections))];
 
-      if (i + BATCH_REQUEST_AMOUNT < tracks.length) {
-        await new Promise((resolve) => setTimeout(resolve, BATCH_REQUEST_INTERVAL_MS));
+      if (i + spotify_api_config.batch_request_amount < tracks.length) {
+        await new Promise((resolve) => setTimeout(resolve, spotify_api_config.batch_request_interval));
       }
     }
 

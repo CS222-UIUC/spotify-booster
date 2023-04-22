@@ -65,16 +65,22 @@ export const web_server_config: WebServerConfig = Object.freeze({
 const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
 const SPOTIFY_REDIRECT_URL = process.env.SPOTIFY_REDIRECT_URL;
+const BATCH_REQUEST_AMOUNT = 100; // number of spotify_api requests to send at one moment to get track sections
+const BATCH_REQUEST_INTERVAL_MS = 10000; // number of milliseconds to wait before sending another batch of requests
 
 export type SpotifyAPIConfig = {
   client_id: string;
   client_secret: string;
   redirect_url: string;
+  batch_request_amount: number;
+  batch_request_interval: number;
 };
 export const spotify_api_config: SpotifyAPIConfig = Object.freeze({
   client_id: SPOTIFY_CLIENT_ID,
   client_secret: SPOTIFY_CLIENT_SECRET,
   redirect_url: SPOTIFY_REDIRECT_URL,
+  batch_request_amount: BATCH_REQUEST_AMOUNT,
+  batch_request_interval: BATCH_REQUEST_INTERVAL_MS,
 });
 
 // SQLITE Database Configuration

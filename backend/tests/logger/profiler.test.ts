@@ -108,7 +108,8 @@ describe('Profiler', () => {
     const profile2 = this.logger.profile('profile2', { debug: 100, info: 100, warn: 100, error: 101, fatal: 101 });
     const profile3 = this.logger.profile('profile3', { debug: 100, info: 100, warn: 101, error: 101, fatal: 101 });
     const profile4 = this.logger.profile('profile4', { debug: 100, info: 101, warn: 101, error: 101, fatal: 101 });
-    const profile5 = this.logger.profile('profile5', { debug: 101, info: 101, warn: 101, error: 101, fatal: 101 });
+    const profile5 = this.logger.profile('profile5', { debug: 101, info: 101, warn: 101, error: 101, fatal: 101 }); // should not be logged
+    const profile6 = this.logger.profile('profile6', { info: 101, warn: 101, error: 101, fatal: 101 });
 
     clock.tick(100);
     profile0.stop();
@@ -117,6 +118,7 @@ describe('Profiler', () => {
     profile3.stop();
     profile4.stop();
     profile5.stop();
+    profile6.stop();
     clock.restore();
 
     assert(
@@ -139,7 +141,10 @@ describe('Profiler', () => {
       this.debug_spy.getCall(0).calledWith('Task "profile4" completed successfully after 100 milliseconds'),
       'Logs correct message'
     );
-    assert.equal(this.debug_spy.callCount, 1, 'Debug only called once');
+    assert(
+      this.debug_spy.getCall(1).calledWith('Task "profile6" completed successfully after 100 milliseconds'),
+      'Logs correct message'
+    );
   });
 
   it('writes message with complex settings', function () {

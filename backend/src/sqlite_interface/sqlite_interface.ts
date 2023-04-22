@@ -19,11 +19,17 @@ export default class SQLiteInterface {
    * @param database_path - path to the .db file
    * @param tables - array of tables to create (runs commands in the format: "CREATE TABLE ${name} ${cols}")
    * ex. { name: "Test", cols: "(col1 STRING, col2 STRING)" } creates a table named test with 2 columns named col1 and col2
+   * @param indexes - array of indexes to create (runs command in the format: "CREATE INDEX ${name} ON ${table}(${column})")
    * @param logger - logger
    */
-  constructor(database_path: string, tables: Array<{ name: string; cols: string }>, logger: Logger) {
+  constructor(
+    database_path: string,
+    tables: Array<{ name: string; cols: string }>,
+    indexes: Array<{ name: string; table: string; column: string }>,
+    logger: Logger
+  ) {
     this.log_ = logger;
-    this.initializeDatabase_(database_path, tables);
+    this.initializeDatabase_(database_path, tables, indexes);
   }
 
   /**
@@ -117,12 +123,37 @@ export default class SQLiteInterface {
   }
 
   /**
+   * createIndexes() - creates indexes on table
+   * @param indexes - array of indexes to create (runs command in the format: "CREATE INDEX ${name} ON ${table}(${column})")
+   */
+  private async createIndexes(indexes: Array<{ name: string; table: string; column: string }>) {
+    for (let i = 0; i < indexes.length; i++) {
+      try {
+        await new Promise<void>((resolve, reject) => {
+          this.db_.run(`CREATE INDEX ${indexes[i].name} ON ${indexes[i].table}(${indexes[i].column})`, (error) => {
+            if (error) return reject(error);
+            resolve();
+          });
+        });
+      } catch (error) {
+        this.log_.error(`Error creating index: ${indexes[i].name}`, error);
+        throw error;
+      }
+    }
+  }
+
+  /**
    * initialize_database_() - accesses database and creates tables that we need
    * @param database_path - path to the .db file
    * @param tables - array of tables to create (runs commands in the format: "CREATE TABLE ${name} ${cols}")
    * ex. { name: "Test", cols: "(col1 STRING, col2 STRING)" } creates a table named test with 2 columns named col1 and col2
+   * @param indexes - array of indexes to create (runs command in the format: "CREATE INDEX ${name} ON ${table}(${column})")
    */
-  private initializeDatabase_(database_path: string, tables: Array<{ name: string; cols: string }>): void {
+  private initializeDatabase_(
+    database_path: string,
+    tables: Array<{ name: string; cols: string }>,
+    indexes: Array<{ name: string; table: string; column: string }>
+  ): void {
     const profile = this.log_.profile('Initialize Database');
 
     this.ready_ = new Promise((res, rej) => {
@@ -157,7 +188,14 @@ export default class SQLiteInterface {
           this.log_.debug(`Database at ${database_path} did not exist, initializating`);
           this.createTables(tables)
             .then(() => {
-              resolve();
+              this.createIndexes(indexes)
+                .then(() => {
+                  resolve();
+                })
+                .catch((error) => {
+                  this.log_.fatal('Failed to create indexes', error);
+                  reject(error);
+                });
             })
             .catch((error) => {
               this.log_.fatal('Failed to create tables', error);

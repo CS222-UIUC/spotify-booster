@@ -13,6 +13,14 @@ const TABLES = [
   },
 ];
 
+// indexes for the database
+const INDEXES = [
+  { name: 'track_mashup_id_index', table: 'tracks', column: 'mashup_id' },
+  { name: 'mashup_mashup_id_index', table: 'mashups', column: 'mashup_id' },
+  { name: 'mashup_name_index', table: 'mashups', column: 'name' },
+  { name: 'mashup_user_id_index', table: 'mashups', column: 'user_id' },
+];
+
 /**
  * DatabaseInterface() - SQLite Abstraction for saving user mashups
  * Contains methods for Creating/Deleting/Editing User Mashups the tracks they contain
@@ -22,6 +30,6 @@ export default class DatabaseInterface extends TrackDBInterface {
    * @param database_path - path to the .db file
    */
   constructor(database_path: string) {
-    super(database_path, TABLES, new Logger('Database'));
+    super(database_path, TABLES, INDEXES, new Logger('Database'));
   }
 }

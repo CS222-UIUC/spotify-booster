@@ -38,8 +38,9 @@ describe('SQLite Interface', () => {
           cols: '(col3 STRING, col4 INT)',
         },
       ];
+      const indexes = [{ name: 'test_index', table: 'test_table0', column: 'col1' }];
       const db_location = path.join(TEST_DB_DIRECTORY, uniqueID());
-      const sqlite_interface = new SQLiteInterfaceTester(db_location, tables, createLoggerStub());
+      const sqlite_interface = new SQLiteInterfaceTester(db_location, tables, indexes, createLoggerStub());
 
       await sqlite_interface.dbRun('INSERT INTO test_table0 VALUES ($col1, $col2)', {
         $col1: 'some string',
@@ -65,7 +66,7 @@ describe('SQLite Interface', () => {
         },
       ];
       const db_location = path.join(__dirname, '..', '..', '..', 'tests', 'sqlite_interface', 'sqlite_interface.test.db');
-      const sqlite_interface = new SQLiteInterfaceTester(db_location, tables, createLoggerStub());
+      const sqlite_interface = new SQLiteInterfaceTester(db_location, tables, [], createLoggerStub());
 
       const rows = await sqlite_interface.dbAll('SELECT * FROM test_table', {});
       const expected_rows = [
@@ -84,7 +85,7 @@ describe('SQLite Interface', () => {
       sinon.stub(sqlite3, 'Database').yields(new Error('Failed to Open Database'));
 
       const db_location = path.join(__dirname, '..', '..', '..', 'tests', 'sqlite_interface', 'sqlite_interface.test.db');
-      const sqlite_interface = new SQLiteInterfaceTester(db_location, [], createLoggerStub());
+      const sqlite_interface = new SQLiteInterfaceTester(db_location, [], [], createLoggerStub());
 
       await assert.isRejected(sqlite_interface.ready, 'Failed to Open Database');
     });
@@ -107,17 +108,36 @@ describe('SQLite Interface', () => {
           cols: '(col3 STRING, col4 INT)',
         },
       ];
+      const indexes = [{ name: 'test_index', table: 'test_table0', column: 'col1' }];
       const db_location = path.join(TEST_DB_DIRECTORY, uniqueID());
-      const sqlite_interface = new SQLiteInterfaceTester(db_location, tables, createLoggerStub());
+      const sqlite_interface = new SQLiteInterfaceTester(db_location, tables, indexes, createLoggerStub());
 
       await assert.isRejected(sqlite_interface.ready, 'Failed to Run Command');
+    });
+
+    it('rejects ready if it fails to create indexes', async () => {
+      const tables = [
+        {
+          name: 'test_table0',
+          cols: '(col1 STRING, col2 INT)',
+        },
+        {
+          name: 'test_table1',
+          cols: '(col3 STRING, col4 INT)',
+        },
+      ];
+      const indexes = [{ name: 'test_index', table: 'not_a_table', column: 'col1' }];
+      const db_location = path.join(TEST_DB_DIRECTORY, uniqueID());
+      const sqlite_interface = new SQLiteInterfaceTester(db_location, tables, indexes, createLoggerStub());
+
+      await assert.isRejected(sqlite_interface.ready);
     });
 
     it('rejected ready if error occurs while checking database exists already or not', async () => {
       sinon.stub(fs, 'existsSync').callsFake(sinon.fake.throws('Failed to Check Exists'));
 
       const db_location = path.join(TEST_DB_DIRECTORY, uniqueID());
-      const sqlite_interface = new SQLiteInterfaceTester(db_location, [], createLoggerStub());
+      const sqlite_interface = new SQLiteInterfaceTester(db_location, [], [], createLoggerStub());
 
       await assert.isRejected(sqlite_interface.ready, 'Failed to Check Exists');
     });
@@ -135,7 +155,7 @@ describe('SQLite Interface', () => {
         };
       });
       const db_location = path.join(TEST_DB_DIRECTORY, uniqueID());
-      const sqlite_interface = new SQLiteInterfaceTester(db_location, [], createLoggerStub());
+      const sqlite_interface = new SQLiteInterfaceTester(db_location, [], [], createLoggerStub());
 
       await assert.isRejected(
         sqlite_interface.dbRun('CREATE TABLE test_table (col1 STRING, col2 INT)', {}),
@@ -154,7 +174,7 @@ describe('SQLite Interface', () => {
         };
       });
       const db_location = path.join(TEST_DB_DIRECTORY, uniqueID());
-      const sqlite_interface = new SQLiteInterfaceTester(db_location, [], createLoggerStub());
+      const sqlite_interface = new SQLiteInterfaceTester(db_location, [], [], createLoggerStub());
 
       await assert.isRejected(
         sqlite_interface.dbAll('SELECT count(*) FROM sqlite_master WHERE type = "table"', {}),
@@ -172,7 +192,7 @@ describe('SQLite Interface', () => {
         };
       });
       const db_location = path.join(TEST_DB_DIRECTORY, uniqueID());
-      const sqlite_interface = new SQLiteInterfaceTester(db_location, [], createLoggerStub());
+      const sqlite_interface = new SQLiteInterfaceTester(db_location, [], [], createLoggerStub());
 
       await assert.isRejected(sqlite_interface.close(), 'Failed to Close');
     });

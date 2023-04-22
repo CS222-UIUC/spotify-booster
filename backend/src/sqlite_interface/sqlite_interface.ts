@@ -214,7 +214,11 @@ export default class SQLiteInterface {
    * @returns Promise resolving to nothing (rejected if an error occurs)
    */
   async close(): Promise<void> {
-    await this.ready_;
+    try {
+      await this.ready_;
+    } catch {
+      /* */
+    }
     return new Promise((resolve, reject) => {
       this.db_.close((error) => {
         if (error) {

@@ -16,6 +16,7 @@ const TABLES = [
 // indexes for the database
 const INDEXES = [
   { name: 'track_mashup_id_index', table: 'tracks', column: 'mashup_id' },
+  { name: 'track_track_id_index', table: 'tracks', column: 'track_id' },
   { name: 'mashup_mashup_id_index', table: 'mashups', column: 'mashup_id' },
   { name: 'mashup_name_index', table: 'mashups', column: 'name' },
   { name: 'mashup_user_id_index', table: 'mashups', column: 'user_id' },

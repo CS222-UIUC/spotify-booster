@@ -9,12 +9,10 @@ import { TrackInfo } from '../database_interface/track_db_interface';
  * @param tracks - array of TrackInfo of tracks to insert to mashup
  */
 export default async function saveToDb(db: DatabaseInterface, mashup_id: string, tracks: Array<TrackInfo>): Promise<void> {
-  const await_create_tracks = [];
-  for (let i = 0; i < tracks.length; i++) {
-    await_create_tracks.push(db.addTrack(mashup_id, tracks[i].track_id, i));
-  }
-
-  await awaitAllPromises(await_create_tracks);
+  await db.addTrackBatch(
+    mashup_id,
+    tracks.map((t) => t.track_id)
+  );
 
   const await_set_sections = [];
   for (const track of tracks) {

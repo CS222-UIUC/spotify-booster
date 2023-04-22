@@ -88,6 +88,28 @@ export default class TrackDBInterface extends MashupDBInterface {
   }
 
   /**
+   * addTrackBatch() - adds many tracks into an empty mashup at once
+   * @param mashup_id - mashup_id of mashup to insert into
+   * @param track_ids - track_ids of tracks to insert
+   */
+  async addTrackBatch(mashup_id: string, track_ids: Array<string>): Promise<void> {
+    const tracks = await this.getMashupTracks(mashup_id);
+    if (tracks.length !== 0) throw new Error('Cannot Insert Into Non-Empty Mashup');
+
+    await this.dbRun('begin transaction', {});
+
+    for (let i = 0; i < track_ids.length; i++) {
+      this.dbRun('INSERT INTO tracks VALUES($mashup_id, $track_id, $index, 0, -1)', {
+        $mashup_id: mashup_id,
+        $track_id: track_ids[i],
+        $index: i,
+      });
+    }
+
+    await this.dbRun('commit', {});
+  }
+
+  /**
    * setStartMS() - sets the start_ms property of a track in a mashup
    * @param mashup_id - unique mashup id
    * @param track_id - spotify track id of track to update

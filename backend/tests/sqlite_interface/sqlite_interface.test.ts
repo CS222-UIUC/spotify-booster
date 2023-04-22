@@ -131,6 +131,8 @@ describe('SQLite Interface', () => {
       const sqlite_interface = new SQLiteInterfaceTester(db_location, tables, indexes, createLoggerStub());
 
       await assert.isRejected(sqlite_interface.ready);
+
+      await sqlite_interface.close();
     });
 
     it('rejected ready if error occurs while checking database exists already or not', async () => {

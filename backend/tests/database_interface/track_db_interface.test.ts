@@ -55,6 +55,16 @@ describe('Track DB Interface', () => {
       await checkTrackDB(this.db, this.id0, this.id1, this.default_mashup0, this.default_mashup1, 8);
     });
 
+    it('creates tracks when given a batch of tracks and valid mashup id', async function () {
+      const mashup_id = await this.db.createMashup('test_mashup', 'some_spotify_user');
+      await this.db.addTrackBatch(
+        mashup_id,
+        this.default_mashup0.map((t: { track_id: string }) => t.track_id)
+      );
+
+      await checkTrackDB(this.db, mashup_id, this.id1, this.default_mashup0, this.default_mashup1, 12);
+    });
+
     it('rejects promise if creating a track with invalid mashup id', async function () {
       const invalid_ids = [
         '', // blank
@@ -84,6 +94,18 @@ describe('Track DB Interface', () => {
 
     it('rejects promise if creating a track that that is already in the mashup', async function () {
       await assert.isRejected(this.db.addTrack(this.id0, 'some_spotify_id0', 0), 'Track Id Exists In Mashup');
+
+      await checkTrackDB(this.db, this.id0, this.id1, this.default_mashup0, this.default_mashup1, 8);
+    });
+
+    it('rejects promise if batch adding tracks with non-empty mashup id', async function () {
+      await assert.isRejected(
+        this.db.addTrackBatch(
+          this.id0,
+          this.default_mashup0.map((t: { track_id: string }) => t.track_id)
+        ),
+        'Cannot Insert Into Non-Empty Mashup'
+      );
 
       await checkTrackDB(this.db, this.id0, this.id1, this.default_mashup0, this.default_mashup1, 8);
     });

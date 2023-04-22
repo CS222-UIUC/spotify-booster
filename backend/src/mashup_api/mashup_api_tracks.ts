@@ -36,8 +36,9 @@ export default function createTracksRouter(log: Logger, db: DatabaseInterface) {
     runAuthMashupAPIFunction(async (req) => {
       const mashup_id = req.query.mashup_id as string;
       const track_id = req.query.track_id as string;
+      const index = parseInt(req.query.index as string);
 
-      await db.addTrack(mashup_id, track_id);
+      await db.addTrack(mashup_id, track_id, index);
       return { code: 200, res: {} };
     }, auth_function)
   );

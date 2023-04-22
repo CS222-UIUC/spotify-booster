@@ -63,9 +63,10 @@ export default class TrackDBInterface extends MashupDBInterface {
    * Note: Aside from blank track_id, the validity of track_id is not checked! (check with spotify first!)
    * @param mashup_id - unique mashup id
    * @param track_id - spotify track id of track to add to mashup
+   * @param index - index in mashup of track
    * @returns Promise resolving to nothing if mashup id and track id are valid (rejected if an error occurs)
    */
-  async addTrack(mashup_id: string, track_id: string): Promise<void> {
+  async addTrack(mashup_id: string, track_id: string, index: number): Promise<void> {
     // check for invalid track_id
     if (this.isEmpty(track_id)) {
       this.log_.debug(`track_id ${track_id} was empty, refusing to create new track`);
@@ -79,13 +80,11 @@ export default class TrackDBInterface extends MashupDBInterface {
       throw new Error('Track Id Exists In Mashup');
     }
 
-    await this.dbRun(
-      'INSERT INTO tracks(mashup_id, track_id, "index", start_ms, end_ms) SELECT $mashup_id, $track_id, IFNULL(MAX("index") + 1, 1), 0, -1 FROM tracks',
-      {
-        $mashup_id: mashup_id,
-        $track_id: track_id,
-      }
-    );
+    await this.dbRun('INSERT INTO tracks VALUES ($mashup_id, $track_id, $index, 0, -1)', {
+      $mashup_id: mashup_id,
+      $track_id: track_id,
+      $index: index,
+    });
   }
 
   /**

@@ -269,12 +269,13 @@ type TrackInfo = {
 ## Add Track
 Adds a new track in the given mashup
 ```http
-PUT: /mashupapi/addTrack?track_id=6wmcrRId5aeo7hiEqHAtEO&mashup_id=45a87c57-aeaf-416a-a7af-7787e9a2a4f4
+PUT: /mashupapi/addTrack?track_id=6wmcrRId5aeo7hiEqHAtEO&mashup_id=45a87c57-aeaf-416a-a7af-7787e9a2a4f4&index=0
 ```
 | Parameter | Type | Description |
 | :--- | :--- | :--- |
 | track_id | `string` | Spotify track_id of song |
 | mashup_id | `string` | Unique mashup_id of the mashup to add to |
+| index | `number` | Index of track in mashup |
 
 ### Response
 ```js

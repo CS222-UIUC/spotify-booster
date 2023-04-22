@@ -46,7 +46,7 @@ describe('Mashup API Authentication', () => {
       },
       { method: 'put', path: `/mashupapi/setMashupName?mashup_id=${this.mashup_id}&name=new_name` },
       { method: 'get', path: `/mashupapi/getMashupTracks?mashup_id=${this.mashup_id}` },
-      { method: 'put', path: `/mashupapi/addTrack?mashup_id=${this.mashup_id}&track_id=track_id` },
+      { method: 'put', path: `/mashupapi/addTrack?mashup_id=${this.mashup_id}&track_id=track_id&index=0` },
       { method: 'put', path: `/mashupapi/setStartMs?mashup_id=${this.mashup_id}&track_id=track_id&start_ms=1` },
       { method: 'put', path: `/mashupapi/setEndMs?mashup_id=${this.mashup_id}&track_id=track_id&end_ms=1` },
       { method: 'delete', path: `/mashupapi/removeTrack?mashup_id=${this.mashup_id}&track_id=track_id` },

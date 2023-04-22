@@ -37,11 +37,9 @@ export default class SQLiteInterface {
     const profiler = this.log_.profile(`Run {cmd: ${cmd}}`, { warn: 1000, error: 5000 });
     try {
       const result: RunResult = await new Promise((resolve, reject) => {
-        this.db_.serialize(() => {
-          this.db_.run(cmd, params, function (error) {
-            if (error) return reject(error);
-            resolve(this);
-          });
+        this.db_.run(cmd, params, function (error) {
+          if (error) return reject(error);
+          resolve(this);
         });
       });
 
@@ -67,11 +65,9 @@ export default class SQLiteInterface {
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const rows: Array<any> = await new Promise((resolve, reject) => {
-        this.db_.serialize(() => {
-          this.db_.all(cmd, params, (error, rows) => {
-            if (error) return reject(error);
-            resolve(rows);
-          });
+        this.db_.all(cmd, params, (error, rows) => {
+          if (error) return reject(error);
+          resolve(rows);
         });
       });
 

@@ -27,6 +27,6 @@ export async function createEmptyMashup(app: express.Application) {
  */
 export async function insertTracks(app: express.Application, mashup_id: string, tracks: TrackInfo[]) {
   for (let i = 0; i < tracks.length; i++) {
-    await request(app).put(`/mashupapi/addTrack?mashup_id=${mashup_id}&track_id=${tracks[i].track_id}`);
+    await request(app).put(`/mashupapi/addTrack?mashup_id=${mashup_id}&track_id=${tracks[i].track_id}&index=${i}`);
   }
 }

@@ -59,7 +59,7 @@ describe('Mashup API Tracks', () => {
     it('adds track with valid mashup_id', async function () {
       for (let i = 0; i < this.default_tracks.length; i++) {
         const response1 = await request(this.app).put(
-          `/mashupapi/addTrack?mashup_id=${this.mashup_id}&track_id=${this.default_tracks[i].track_id}`
+          `/mashupapi/addTrack?mashup_id=${this.mashup_id}&track_id=${this.default_tracks[i].track_id}&index=0`
         );
         assert.equal(response1.statusCode, 200, 'Responds with success status code');
       }
@@ -73,7 +73,9 @@ describe('Mashup API Tracks', () => {
     it('refuses to add track with invalid mashup_id', async function () {
       const mashup_id = 'invalid';
       const track_id = '6wmcrRId5aeo7hiEqHAtEO';
-      const response1 = await request(this.app).put(`/mashupapi/addTrack?mashup_id=${mashup_id}&track_id=${track_id}`);
+      const response1 = await request(this.app).put(
+        `/mashupapi/addTrack?mashup_id=${mashup_id}&track_id=${track_id}&index=0`
+      );
 
       assert.equal(response1.statusCode, 400, 'Responds with bad request code');
       assert.equal(response1.body.error_message, 'Invalid Mashup Id', 'Responds with error message');
@@ -81,7 +83,9 @@ describe('Mashup API Tracks', () => {
 
     it('refuses to add track with invalid track_id', async function () {
       const track_id = '';
-      const response = await request(this.app).put(`/mashupapi/addTrack?mashup_id=${this.mashup_id}&track_id=${track_id}`);
+      const response = await request(this.app).put(
+        `/mashupapi/addTrack?mashup_id=${this.mashup_id}&track_id=${track_id}&index=0`
+      );
 
       assert.equal(response.statusCode, 400, 'Responds with bad request code');
       assert.equal(response.body.error_message, 'Invalid Track Id', 'Responds with error message');

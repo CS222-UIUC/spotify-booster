@@ -10,8 +10,8 @@ import { TrackInfo } from '../database_interface/track_db_interface';
  */
 export default async function saveToDb(db: DatabaseInterface, mashup_id: string, tracks: Array<TrackInfo>): Promise<void> {
   const await_create_tracks = [];
-  for (const { track_id } of tracks) {
-    await_create_tracks.push(db.addTrack(mashup_id, track_id));
+  for (let i = 0; i < tracks.length; i++) {
+    await_create_tracks.push(db.addTrack(mashup_id, tracks[i].track_id, i));
   }
 
   await awaitAllPromises(await_create_tracks);

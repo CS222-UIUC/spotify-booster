@@ -36,8 +36,10 @@ describe('Track DB Interface', () => {
       { track_id: 'some_spotify_id4', start_ms: 0, end_ms: -1 },
       { track_id: 'some_spotify_id6', start_ms: 0, end_ms: -1 },
     ];
-    for (const track of this.default_mashup0) await this.db.addTrack(this.id0, track.track_id);
-    for (const track of this.default_mashup1) await this.db.addTrack(this.id1, track.track_id);
+    for (let i = 0; i < this.default_mashup0.length; i++)
+      await this.db.addTrack(this.id0, this.default_mashup0[i].track_id, i);
+    for (let i = 0; i < this.default_mashup1.length; i++)
+      await this.db.addTrack(this.id1, this.default_mashup1[i].track_id, i);
   });
 
   afterEach(async function () {
@@ -68,20 +70,20 @@ describe('Track DB Interface', () => {
         crypto.createHash('sha256').update((100).toString()).digest('base64'), // correct format but non existing id
       ];
       for (const invalid of invalid_ids) {
-        await assert.isRejected(this.db.addTrack(invalid, 'some_spotify_id10'), 'Invalid Mashup Id');
+        await assert.isRejected(this.db.addTrack(invalid, 'some_spotify_id10', 0), 'Invalid Mashup Id');
       }
 
       await checkTrackDB(this.db, this.id0, this.id1, this.default_mashup0, this.default_mashup1, 8);
     });
 
     it('rejects promise if creating a track with blank track id', async function () {
-      await assert.isRejected(this.db.addTrack(this.id0, ''), 'Invalid Track Id');
+      await assert.isRejected(this.db.addTrack(this.id0, '', 0), 'Invalid Track Id');
 
       await checkTrackDB(this.db, this.id0, this.id1, this.default_mashup0, this.default_mashup1, 8);
     });
 
     it('rejects promise if creating a track that that is already in the mashup', async function () {
-      await assert.isRejected(this.db.addTrack(this.id0, 'some_spotify_id0'), 'Track Id Exists In Mashup');
+      await assert.isRejected(this.db.addTrack(this.id0, 'some_spotify_id0', 0), 'Track Id Exists In Mashup');
 
       await checkTrackDB(this.db, this.id0, this.id1, this.default_mashup0, this.default_mashup1, 8);
     });
